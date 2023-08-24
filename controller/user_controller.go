@@ -1,16 +1,20 @@
 package controller
 
 import (
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
+	"strings"
 )
 
 func userController() {
-	router.GET("/user", getUsers)
-	router.GET("/user/:id", getUser)
+	router.GET("/users", getUsers)
+	router.GET("/user", getUser)
+	router.GET("/user/:id", getUserById)
 	router.DELETE("/user/:id", removeUser)
 	router.POST("/user", addUser)
 	router.PUT("/user", updateUser)
@@ -27,6 +31,29 @@ func getUsers(c *gin.Context) {
 }
 
 func getUser(c *gin.Context) {
+
+	tokenString := strings.Split(c.Request.Header["Authorization"][0], " ")[1]
+
+	fmt.Printf("received token: %s\n", tokenString)
+
+	token, err := jwt.Parse(tokenString, nil)
+	if token == nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	claims, _ := token.Claims.(jwt.MapClaims)
+	sub := fmt.Sprintf("%s", claims["sub"])
+
+	user, err := service.GetUserByKeycloakId(sub)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, user)
+}
+
+func getUserById(c *gin.Context) {
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})

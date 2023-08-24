@@ -16,13 +16,13 @@ func userService(database *mongo.Database) {
 	collection = database.Collection("user")
 }
 
-func GetUsers() ([]model.User, error) {
+func getUsersByBsonDocument(d interface{}) ([]model.User, error) {
 	var users []model.User
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	cursor, err := collection.Find(ctx, bson.M{})
+	cursor, err := collection.Find(ctx, d)
 	if err != nil {
 		return []model.User{}, err
 	}
@@ -41,24 +41,29 @@ func GetUsers() ([]model.User, error) {
 	return users, nil
 }
 
-func GetUserById(id primitive.ObjectID) (model.User, error) {
-	var user model.User
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	cursor, err := collection.Find(ctx, bson.D{{"_id", id}})
+func getUserByBsonDocument(d interface{}) (model.User, error) {
+	users, err := getUsersByBsonDocument(d)
 	if err != nil {
 		return model.User{}, err
 	}
-	defer cursor.Close(ctx)
 
-	if cursor.Next(ctx) {
-		cursor.Decode(&user)
-		return user, nil
+	if len(users) <= 0 {
+		return model.User{}, errors.New("no entry found")
 	}
 
-	return model.User{}, errors.New("no entry with given id found")
+	return users[0], nil
+}
+
+func GetUsers() ([]model.User, error) {
+	return getUsersByBsonDocument(bson.D{})
+}
+
+func GetUserById(id primitive.ObjectID) (model.User, error) {
+	return getUserByBsonDocument(bson.D{{"_id", id}})
+}
+
+func GetUserByKeycloakId(id string) (model.User, error) {
+	return getUserByBsonDocument(bson.D{{"keycloak_id", id}})
 }
 
 func RemoveUserById(id primitive.ObjectID) error {
