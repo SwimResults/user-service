@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/google/uuid"
 	"github.com/swimresults/user-service/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -11,6 +12,8 @@ import (
 )
 
 var collection *mongo.Collection
+
+const entryNotFoundMessage = "no entry found"
 
 func userService(database *mongo.Database) {
 	collection = database.Collection("user")
@@ -48,7 +51,7 @@ func getUserByBsonDocument(d interface{}) (model.User, error) {
 	}
 
 	if len(users) <= 0 {
-		return model.User{}, errors.New("no entry found")
+		return model.User{}, errors.New(entryNotFoundMessage)
 	}
 
 	return users[0], nil
@@ -62,8 +65,24 @@ func GetUserById(id primitive.ObjectID) (model.User, error) {
 	return getUserByBsonDocument(bson.D{{"_id", id}})
 }
 
-func GetUserByKeycloakId(id string) (model.User, error) {
-	return getUserByBsonDocument(bson.D{{"keycloak_id", id}})
+// GetUserByKeycloakId gets a user by keycloak id, creates new one if not existing so far
+func GetUserByKeycloakId(id uuid.UUID) (model.User, error) {
+	user, err := getUserByBsonDocument(bson.D{{"keycloak_id", id.String()}})
+	if err != nil {
+		if err.Error() == entryNotFoundMessage {
+
+			user.KeycloakId = id.String()
+
+			user, err = AddUser(user)
+			if err != nil {
+				return model.User{}, err
+			}
+
+		} else {
+			return model.User{}, err
+		}
+	}
+	return user, nil
 }
 
 func RemoveUserById(id primitive.ObjectID) error {
@@ -88,6 +107,32 @@ func AddUser(user model.User) (model.User, error) {
 	}
 
 	return GetUserById(r.InsertedID.(primitive.ObjectID))
+}
+
+func ModifyFollowForUser(id uuid.UUID, athleteId primitive.ObjectID, follow bool) (model.User, error) {
+	user, err := GetUserByKeycloakId(id)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	for i, following := range user.Following {
+		if following.AthleteId == athleteId {
+			if follow {
+				return user, nil
+			} else {
+				user.Following = append(user.Following[:i], user.Following[i+1:]...)
+			}
+		}
+	}
+
+	if follow {
+		user.Following = append(user.Following, model.Following{
+			AthleteId: athleteId,
+			AddedAt:   time.Now(),
+		})
+	}
+
+	return UpdateUser(user)
 }
 
 func UpdateUser(user model.User) (model.User, error) {
