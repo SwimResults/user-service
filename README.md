@@ -1,12 +1,12 @@
-# example-service
+# user-service
 
-determining if go should be used for apis and microservices
+microservice with REST API to fetch additional data to users, store followers and user settings
 
-| features | Java | Go  |
-|----------|------|-----|
-| repo, service, controller structure   |  x   | x   |
-| swagger |x| ?   |
-| spring auth |x| ?   |
-| jdbc |x| x   |
-| hibernate |x| x   |
-| junit tests |x| x   |
+## Endpoints
+
+    [GIN-debug] GET    /user                     --> github.com/swimresults/user-service/controller.getUsers (3 handlers)
+    [GIN-debug] GET    /user/:id                 --> github.com/swimresults/user-service/controller.getUser (3 handlers)   
+    [GIN-debug] DELETE /user/:id                 --> github.com/swimresults/user-service/controller.removeUser (3 handlers)
+    [GIN-debug] POST   /user                     --> github.com/swimresults/user-service/controller.addUser (3 handlers)   
+    [GIN-debug] PUT    /user                     --> github.com/swimresults/user-service/controller.updateUser (3 handlers)
+    [GIN-debug] GET    /actuator                 --> github.com/swimresults/user-service/controller.actuator (3 handlers)

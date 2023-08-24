@@ -3,65 +3,65 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/swimresults/user-service/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"sr-example/example-service/model"
 	"time"
 )
 
 var collection *mongo.Collection
 
-func exampleService(database *mongo.Database) {
-	collection = database.Collection("example")
+func userService(database *mongo.Database) {
+	collection = database.Collection("user")
 }
 
-func GetExamples() ([]model.Example, error) {
-	var examples []model.Example
+func GetUsers() ([]model.User, error) {
+	var users []model.User
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	cursor, err := collection.Find(ctx, bson.M{})
 	if err != nil {
-		return []model.Example{}, err
+		return []model.User{}, err
 	}
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
-		var example model.Example
-		cursor.Decode(&example)
-		examples = append(examples, example)
+		var user model.User
+		cursor.Decode(&user)
+		users = append(users, user)
 	}
 
 	if err := cursor.Err(); err != nil {
-		return []model.Example{}, err
+		return []model.User{}, err
 	}
 
-	return examples, nil
+	return users, nil
 }
 
-func GetExampleById(id primitive.ObjectID) (model.Example, error) {
-	var example model.Example
+func GetUserById(id primitive.ObjectID) (model.User, error) {
+	var user model.User
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	cursor, err := collection.Find(ctx, bson.D{{"_id", id}})
 	if err != nil {
-		return model.Example{}, err
+		return model.User{}, err
 	}
 	defer cursor.Close(ctx)
 
 	if cursor.Next(ctx) {
-		cursor.Decode(&example)
-		return example, nil
+		cursor.Decode(&user)
+		return user, nil
 	}
 
-	return model.Example{}, errors.New("no entry with given id found")
+	return model.User{}, errors.New("no entry with given id found")
 }
 
-func RemoveExampleById(id primitive.ObjectID) error {
+func RemoveUserById(id primitive.ObjectID) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -73,26 +73,26 @@ func RemoveExampleById(id primitive.ObjectID) error {
 	return nil
 }
 
-func AddExample(example model.Example) (model.Example, error) {
+func AddUser(user model.User) (model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	r, err := collection.InsertOne(ctx, example)
+	r, err := collection.InsertOne(ctx, user)
 	if err != nil {
-		return model.Example{}, err
+		return model.User{}, err
 	}
 
-	return GetExampleById(r.InsertedID.(primitive.ObjectID))
+	return GetUserById(r.InsertedID.(primitive.ObjectID))
 }
 
-func UpdateExample(example model.Example) (model.Example, error) {
+func UpdateUser(user model.User) (model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err := collection.ReplaceOne(ctx, bson.D{{"_id", example.Identifier}}, example)
+	_, err := collection.ReplaceOne(ctx, bson.D{{"_id", user.Identifier}}, user)
 	if err != nil {
-		return model.Example{}, err
+		return model.User{}, err
 	}
 
-	return GetExampleById(example.Identifier)
+	return GetUserById(user.Identifier)
 }

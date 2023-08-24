@@ -3,23 +3,23 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/swimresults/user-service/service"
 	"net/http"
 	"os"
-	"sr-example/example-service/service"
 )
 
 var router = gin.Default()
 
 func Run() {
 
-	port := os.Getenv("SR_EXAMPLE_PORT")
+	port := os.Getenv("SR_USER_PORT")
 
 	if port == "" {
-		fmt.Println("no application port given! Please set SR_EXAMPLE_PORT.")
+		fmt.Println("no application port given! Please set SR_USER_PORT.")
 		return
 	}
 
-	exampleController()
+	userController()
 
 	router.GET("/actuator", actuator)
 

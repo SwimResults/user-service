@@ -4,10 +4,10 @@ FROM golang:1.16-alpine
 
 WORKDIR /app
 
-COPY example-service /app/service
+COPY user-service /app/service
 RUN chmod +x /app/service
 
-ENV SR_EXAMPLE_PORT=8080
+ENV SR_USER_PORT=8080
 
 EXPOSE 8080
 
