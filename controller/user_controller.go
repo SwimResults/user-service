@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,13 @@ func userController() {
 	router.DELETE("/user/:id", removeUser)
 
 	router.PUT("/user", updateUser)
+
+	router.OPTIONS("/user", okay)
+	router.OPTIONS("/user/athlete", okay)
+}
+
+func okay(c *gin.Context) {
+	c.Status(200)
 }
 
 func getUsers(c *gin.Context) {
@@ -142,6 +150,12 @@ func updateUser(c *gin.Context) {
 }
 
 func getUUIDFromRequest(c *gin.Context) (*uuid.UUID, error) {
+	if len(c.Request.Header["Authorization"]) == 0 {
+		err1 := errors.New("no authorization in header")
+		c.IndentedJSON(http.StatusUnauthorized, err1.Error())
+		return nil, err1
+	}
+
 	tokenString := strings.Split(c.Request.Header["Authorization"][0], " ")[1]
 
 	token, err1 := jwt.Parse(tokenString, nil)
