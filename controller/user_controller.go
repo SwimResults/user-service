@@ -35,6 +35,11 @@ func okay(c *gin.Context) {
 }
 
 func getUsers(c *gin.Context) {
+
+	if failIfNotRoot(c) {
+		return
+	}
+
 	users, err := service.GetUsers()
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -46,14 +51,14 @@ func getUsers(c *gin.Context) {
 
 func getUser(c *gin.Context) {
 
-	id, err1 := getUUIDFromRequest(c)
+	claims, err1 := getClaimsFromAuthHeader(c)
 
 	if err1 != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
 		return
 	}
 
-	user, err := service.GetUserByKeycloakId(*id)
+	user, err := service.GetUserByKeycloakId(claims.Sub)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
@@ -63,6 +68,11 @@ func getUser(c *gin.Context) {
 }
 
 func getUserById(c *gin.Context) {
+
+	if failIfNotRoot(c) {
+		return
+	}
+
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
@@ -79,6 +89,11 @@ func getUserById(c *gin.Context) {
 }
 
 func removeUser(c *gin.Context) {
+
+	if failIfNotRoot(c) {
+		return
+	}
+
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
@@ -95,6 +110,11 @@ func removeUser(c *gin.Context) {
 }
 
 func addUser(c *gin.Context) {
+
+	if failIfNotRoot(c) {
+		return
+	}
+
 	var user model.User
 	if err := c.BindJSON(&user); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -111,7 +131,7 @@ func addUser(c *gin.Context) {
 }
 
 func changeFollowerForUser(c *gin.Context) {
-	id, err1 := getUUIDFromRequest(c)
+	claims, err1 := getClaimsFromAuthHeader(c)
 
 	if err1 != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
@@ -124,7 +144,7 @@ func changeFollowerForUser(c *gin.Context) {
 		return
 	}
 
-	user, err2 := service.ModifyFollowForUser(*id, request.AthleteId, request.Follow)
+	user, err2 := service.ModifyFollowForUser(claims.Sub, request.AthleteId, request.Follow)
 	if err2 != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err2.Error()})
 		return
@@ -134,6 +154,11 @@ func changeFollowerForUser(c *gin.Context) {
 }
 
 func updateUser(c *gin.Context) {
+
+	if failIfNotRoot(c) {
+		return
+	}
+
 	var user model.User
 	if err := c.BindJSON(&user); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -149,7 +174,7 @@ func updateUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, r)
 }
 
-func getUUIDFromRequest(c *gin.Context) (*uuid.UUID, error) {
+func getClaimsFromAuthHeader(c *gin.Context) (*model.TokenClaims, error) {
 	if len(c.Request.Header["Authorization"]) == 0 {
 		err1 := errors.New("no authorization in header")
 		c.IndentedJSON(http.StatusUnauthorized, err1.Error())
@@ -170,5 +195,27 @@ func getUUIDFromRequest(c *gin.Context) (*uuid.UUID, error) {
 		return nil, err2
 	}
 
-	return &id, nil
+	var tokenClaims model.TokenClaims
+
+	tokenClaims.Sub = id
+	tokenClaims.Scopes = strings.Split(fmt.Sprintf("%s", claims["scope"]), " ")
+
+	return &tokenClaims, nil
+}
+
+func failIfNotRoot(c *gin.Context) bool {
+
+	claims, err1 := getClaimsFromAuthHeader(c)
+
+	if err1 != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+		return true
+	}
+
+	if !claims.IsRoot() {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"message": "insufficient permissions"})
+		return true
+	}
+
+	return false
 }
