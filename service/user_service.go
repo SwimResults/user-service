@@ -135,6 +135,21 @@ func ModifyFollowForUser(id uuid.UUID, athleteId primitive.ObjectID, follow bool
 	return UpdateUser(user)
 }
 
+func ModifyMe(id uuid.UUID, athleteId primitive.ObjectID, set bool) (model.User, error) {
+	user, err := GetUserByKeycloakId(id)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	if set {
+		user.OwnAthleteId = athleteId
+	} else {
+		user.OwnAthleteId = primitive.ObjectID{}
+	}
+
+	return UpdateUser(user)
+}
+
 func UpdateUser(user model.User) (model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
