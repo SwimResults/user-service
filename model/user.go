@@ -9,5 +9,6 @@ type User struct {
 	KeycloakId   string             `json:"keycloak_id,omitempty" bson:"keycloak_id,omitempty"`
 	Following    []Following        `json:"following,omitempty" bson:"following,omitempty"`
 	OwnAthleteId primitive.ObjectID `json:"own_athlete_id,omitempty" bson:"own_athlete_id,omitempty"`
-	Language     string             `json:"language,omitempty" bson:"language,omitempty"`
+	Settings     Settings           `json:"settings,omitempty" bson:"settings,omitempty"`
+	Meetings     []string           `json:"meetings,omitempty" bson:"meetings,omitempty"`
 }

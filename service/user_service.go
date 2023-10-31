@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/uuid"
+	"github.com/swimresults/service-core/misc"
 	"github.com/swimresults/user-service/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -168,7 +169,38 @@ func ModifyUserLanguage(id uuid.UUID, language string) (model.User, error) {
 		return model.User{}, err
 	}
 
-	user.Language = language
+	user.Settings.Language = language
+
+	return UpdateUser(user)
+}
+
+func ModifyUserTheme(id uuid.UUID, theme string) (model.User, error) {
+	user, err := GetUserByKeycloakId(id)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	user.Settings.Theme = theme
+
+	return UpdateUser(user)
+}
+
+func ModifyUserMeetings(id uuid.UUID, meeting string, subscribe bool) (model.User, error) {
+	user, err := GetUserByKeycloakId(id)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	if subscribe {
+		user.Meetings = misc.AppendWithoutDuplicates(user.Meetings, meeting)
+	} else {
+		for i, m := range user.Meetings {
+			if m == meeting {
+				user.Meetings = append(user.Meetings[:i], user.Meetings[i+1:]...)
+				break
+			}
+		}
+	}
 
 	return UpdateUser(user)
 }
