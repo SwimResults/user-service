@@ -22,6 +22,7 @@ func userController() {
 	router.POST("/user", addUser)
 	router.POST("/user/athlete", changeFollowerForUser)
 	router.POST("/user/me", changeMe)
+	router.POST("/user/language", updateUserLanguage)
 
 	router.DELETE("/user/:id", removeUser)
 
@@ -169,6 +170,29 @@ func changeMe(c *gin.Context) {
 	}
 
 	user, err2 := service.ModifyMe(claims.Sub, request.AthleteId, request.Set)
+	if err2 != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err2.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, user)
+}
+
+func updateUserLanguage(c *gin.Context) {
+	claims, err1 := getClaimsFromAuthHeader(c)
+
+	if err1 != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+		return
+	}
+
+	var request dto.SetLanguageRequestDto
+	if err := c.BindJSON(&request); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	user, err2 := service.ModifyUserLanguage(claims.Sub, request.Language)
 	if err2 != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err2.Error()})
 		return

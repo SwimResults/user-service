@@ -161,3 +161,14 @@ func UpdateUser(user model.User) (model.User, error) {
 
 	return GetUserById(user.Identifier)
 }
+
+func ModifyUserLanguage(id uuid.UUID, language string) (model.User, error) {
+	user, err := GetUserByKeycloakId(id)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	user.Language = language
+
+	return UpdateUser(user)
+}
