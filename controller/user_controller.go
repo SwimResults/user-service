@@ -32,6 +32,10 @@ func userController() {
 
 	router.OPTIONS("/user", okay)
 	router.OPTIONS("/user/athlete", okay)
+	router.OPTIONS("/user/meeting", okay)
+	router.OPTIONS("/user/me", okay)
+	router.OPTIONS("/user/language", okay)
+	router.OPTIONS("/user/theme", okay)
 }
 
 func okay(c *gin.Context) {
