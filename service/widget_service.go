@@ -108,24 +108,46 @@ func GetDashboardById(id primitive.ObjectID) (model.Dashboard, error) {
 	return getDashboardByBsonDocument(bson.D{{"_id", id}})
 }
 
-func GetDefaultDashboard() (model.Dashboard, error) {
-	return getDashboardByBsonDocument(bson.D{{"default", true}})
+func GetDefaultDashboard(meetingState string) (model.Dashboard, error) {
+	return getDashboardByBsonDocument(
+		bson.M{
+			"$and": []interface{}{
+				bson.M{"default": true},
+				bson.M{
+					"$or": []interface{}{
+						bson.M{"meeting_state": meetingState},
+						bson.M{"meeting_state": bson.M{"$exists": false}},
+					},
+				},
+			},
+		})
 }
 
-func getUserDashboard(uuid uuid.UUID) (model.Dashboard, error) {
-	return getDashboardByBsonDocument(bson.D{{"user", uuid.String()}})
+func getUserDashboard(meetingState string, uuid uuid.UUID) (model.Dashboard, error) {
+	return getDashboardByBsonDocument(
+		bson.M{
+			"$and": []interface{}{
+				bson.M{"user": uuid.String()},
+				bson.M{
+					"$or": []interface{}{
+						bson.M{"meeting_state": meetingState},
+						bson.M{"meeting_state": bson.M{"$exists": false}},
+					},
+				},
+			},
+		})
 }
 
 // GetDashboardForUser returns the dashboard for the user, a boolean if it is the default dashboard and if occurred an error
-func GetDashboardForUser(uuid uuid.UUID) (*model.Dashboard, bool, error) {
+func GetDashboardForUser(meetingState string, uuid uuid.UUID) (*model.Dashboard, bool, error) {
 	var dashboard model.Dashboard
 	var err error
 	isDefault := false
 
-	dashboard, err = getUserDashboard(uuid)
+	dashboard, err = getUserDashboard(meetingState, uuid)
 	if err != nil {
 		if err.Error() == entryNotFoundMessage {
-			dashboard, err = GetDefaultDashboard()
+			dashboard, err = GetDefaultDashboard(meetingState)
 			isDefault = true
 		}
 	}
@@ -136,40 +158,32 @@ func GetDashboardForUser(uuid uuid.UUID) (*model.Dashboard, bool, error) {
 	return &dashboard, isDefault, nil
 }
 
-func RemoveUserDashboard(uuid uuid.UUID) error {
+func RemoveUserDashboard(id primitive.ObjectID, uuid uuid.UUID) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err := widgetCollection.DeleteOne(ctx, bson.D{{"user", uuid.String()}})
+	_, err := widgetCollection.DeleteOne(ctx, bson.D{{"user", uuid.String()}, {"_id", id}})
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func SetUserDashboard(dashboard model.Dashboard, uuid uuid.UUID) (model.Dashboard, bool, error) {
+func AddUserDashboard(dashboard model.Dashboard, uuid uuid.UUID) (model.Dashboard, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	overwrite := true
-
-	_, err := getUserDashboard(uuid)
-	if err != nil {
-		if err.Error() != entryNotFoundMessage {
-			return model.Dashboard{}, false, err
-		}
-		overwrite = true
-	}
+	dashboard.User = uuid.String()
 
 	r, err := widgetCollection.InsertOne(ctx, dashboard)
 	if err != nil {
-		return model.Dashboard{}, false, err
+		return model.Dashboard{}, err
 	}
 
 	newDashboard, err1 := GetDashboardById(r.InsertedID.(primitive.ObjectID))
 	if err1 != nil {
-		return model.Dashboard{}, overwrite, err1
+		return model.Dashboard{}, err1
 	}
-	return newDashboard, overwrite, nil
+	return newDashboard, nil
 }
