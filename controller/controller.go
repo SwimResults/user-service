@@ -20,6 +20,7 @@ func Run() {
 	}
 
 	userController()
+	widgetController()
 
 	router.GET("/actuator", actuator)
 

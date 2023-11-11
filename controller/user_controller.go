@@ -21,6 +21,10 @@ func userController() {
 
 	router.POST("/user", addUser)
 	router.POST("/user/athlete", changeFollowerForUser)
+	router.POST("/user/meeting", updateMeetings)
+	router.POST("/user/me", changeMe)
+	router.POST("/user/language", updateUserLanguage)
+	router.POST("/user/theme", updateUserTheme)
 
 	router.DELETE("/user/:id", removeUser)
 
@@ -28,6 +32,10 @@ func userController() {
 
 	router.OPTIONS("/user", okay)
 	router.OPTIONS("/user/athlete", okay)
+	router.OPTIONS("/user/meeting", okay)
+	router.OPTIONS("/user/me", okay)
+	router.OPTIONS("/user/language", okay)
+	router.OPTIONS("/user/theme", okay)
 }
 
 func okay(c *gin.Context) {
@@ -145,6 +153,98 @@ func changeFollowerForUser(c *gin.Context) {
 	}
 
 	user, err2 := service.ModifyFollowForUser(claims.Sub, request.AthleteId, request.Follow)
+	if err2 != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err2.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, user)
+}
+
+func changeMe(c *gin.Context) {
+	claims, err1 := getClaimsFromAuthHeader(c)
+
+	if err1 != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+		return
+	}
+
+	var request dto.SetMeRequestDto
+	if err := c.BindJSON(&request); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	user, err2 := service.ModifyMe(claims.Sub, request.AthleteId, request.Set)
+	if err2 != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err2.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, user)
+}
+
+func updateUserLanguage(c *gin.Context) {
+	claims, err1 := getClaimsFromAuthHeader(c)
+
+	if err1 != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+		return
+	}
+
+	var request dto.SetLanguageRequestDto
+	if err := c.BindJSON(&request); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	user, err2 := service.ModifyUserLanguage(claims.Sub, request.Language)
+	if err2 != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err2.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, user)
+}
+
+func updateUserTheme(c *gin.Context) {
+	claims, err1 := getClaimsFromAuthHeader(c)
+
+	if err1 != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+		return
+	}
+
+	var request dto.SetThemeRequestDto
+	if err := c.BindJSON(&request); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	user, err2 := service.ModifyUserTheme(claims.Sub, request.Theme)
+	if err2 != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err2.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, user)
+}
+
+func updateMeetings(c *gin.Context) {
+	claims, err1 := getClaimsFromAuthHeader(c)
+
+	if err1 != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+		return
+	}
+
+	var request dto.SubscribeMeetingRequestDto
+	if err := c.BindJSON(&request); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	user, err2 := service.ModifyUserMeetings(claims.Sub, request.Meeting, request.Subscribe)
 	if err2 != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err2.Error()})
 		return
