@@ -67,7 +67,7 @@ func getDashboardForStateIfFound(d bson.M, meetingState string) (model.Dashboard
 		bson.M{
 			"$and": []interface{}{
 				d,
-				bson.M{"meeting_state": meetingState},
+				bson.M{"meeting_states": meetingState},
 			},
 		})
 
@@ -77,7 +77,7 @@ func getDashboardForStateIfFound(d bson.M, meetingState string) (model.Dashboard
 				bson.M{
 					"$and": []interface{}{
 						d,
-						bson.M{"meeting_state": bson.M{"$exists": false}},
+						bson.M{"meeting_states": bson.M{"$exists": false}},
 					},
 				})
 		}
