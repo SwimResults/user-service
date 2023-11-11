@@ -62,38 +62,40 @@ func getDashboardByBsonDocument(d interface{}) (model.Dashboard, error) {
 	return dashboards[0], nil
 }
 
+func getDashboardForStateIfFound(d bson.M, meetingState string) (model.Dashboard, error) {
+	dashboard, err := getDashboardByBsonDocument(
+		bson.M{
+			"$and": []interface{}{
+				d,
+				bson.M{"meeting_state": meetingState},
+			},
+		})
+
+	if err != nil {
+		if err.Error() == entryNotFoundMessage {
+			return getDashboardByBsonDocument(
+				bson.M{
+					"$and": []interface{}{
+						d,
+						bson.M{"meeting_state": bson.M{"$exists": false}},
+					},
+				})
+		}
+		return model.Dashboard{}, err
+	}
+	return dashboard, nil
+}
+
 func GetDashboardById(id primitive.ObjectID) (model.Dashboard, error) {
 	return getDashboardByBsonDocument(bson.D{{"_id", id}})
 }
 
 func GetDefaultDashboard(meetingState string) (model.Dashboard, error) {
-	return getDashboardByBsonDocument(
-		bson.M{
-			"$and": []interface{}{
-				bson.M{"default": true},
-				bson.M{
-					"$or": []interface{}{
-						bson.M{"meeting_state": meetingState},
-						bson.M{"meeting_state": bson.M{"$exists": false}},
-					},
-				},
-			},
-		})
+	return getDashboardForStateIfFound(bson.M{"default": true}, meetingState)
 }
 
 func getUserDashboard(meetingState string, uuid uuid.UUID) (model.Dashboard, error) {
-	return getDashboardByBsonDocument(
-		bson.M{
-			"$and": []interface{}{
-				bson.M{"user": uuid.String()},
-				bson.M{
-					"$or": []interface{}{
-						bson.M{"meeting_state": meetingState},
-						bson.M{"meeting_state": bson.M{"$exists": false}},
-					},
-				},
-			},
-		})
+	return getDashboardForStateIfFound(bson.M{"user": uuid.String()}, meetingState)
 }
 
 // GetDashboardForUser returns the dashboard for the user, a boolean if it is the default dashboard and if occurred an error
