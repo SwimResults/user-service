@@ -33,9 +33,9 @@ func getDashboardsByBsonDocument(d interface{}) ([]model.Dashboard, error) {
 		var dashboard model.Dashboard
 		cursor.Decode(&dashboard)
 
-		for _, container := range dashboard.WidgetContainer {
-			for _, widget := range container.Widgets {
-				widget.Widget, _ = getWidgetById(widget.WidgetID)
+		for i, container := range dashboard.WidgetContainer {
+			for j, widget := range container.Widgets {
+				dashboard.WidgetContainer[i].Widgets[j].Widget, _ = getWidgetById(widget.WidgetID)
 			}
 		}
 
@@ -134,9 +134,9 @@ func AddUserDashboard(dashboard model.Dashboard, uuid uuid.UUID) (model.Dashboar
 
 	dashboard.User = uuid.String()
 
-	for _, container := range dashboard.WidgetContainer {
-		for _, widget := range container.Widgets {
-			widget.WidgetID = widget.Widget.Identifier
+	for i, container := range dashboard.WidgetContainer {
+		for j, widget := range container.Widgets {
+			dashboard.WidgetContainer[i].Widgets[j].WidgetID = widget.Widget.Identifier
 		}
 	}
 
