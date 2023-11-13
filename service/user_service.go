@@ -143,9 +143,9 @@ func ModifyMe(id uuid.UUID, athleteId primitive.ObjectID, set bool) (model.User,
 	}
 
 	if set {
-		user.OwnAthleteId = athleteId
+		user.OwnAthleteId = &athleteId
 	} else {
-		user.OwnAthleteId = primitive.ObjectID{}
+		user.OwnAthleteId = &primitive.ObjectID{}
 	}
 
 	return UpdateUser(user)
