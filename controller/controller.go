@@ -21,6 +21,7 @@ func Run() {
 
 	userController()
 	widgetController()
+	dashboardController()
 
 	router.GET("/actuator", actuator)
 

@@ -10,14 +10,10 @@ import (
 
 func widgetController() {
 	router.GET("/widget", getWidgets)
-	router.GET("/dashboard", getUserDashboard)
-	router.GET("/dashboard/default", getDefaultDashboard)
 
-	router.POST("/dashboard", addUserDashboard)
+	router.POST("/widget", addWidget)
 
-	router.DELETE("/dashboard/:id", removeUserDashboard)
-
-	router.OPTIONS("/dashboard", okay)
+	router.DELETE("/widget/:id", removeWidget)
 }
 
 func getWidgets(c *gin.Context) {
@@ -30,64 +26,28 @@ func getWidgets(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, widgets)
 }
 
-func getUserDashboard(c *gin.Context) {
-	claims, err1 := getClaimsFromAuthHeader(c)
-
-	if err1 != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+func addWidget(c *gin.Context) {
+	if failIfNotRoot(c) {
 		return
 	}
 
-	state := c.Query("meeting_state")
+	var widget model.Widget
+	if err := c.BindJSON(&widget); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
 
-	dashboard, _, err := service.GetDashboardForUser(state, claims.Sub)
+	widget, err := service.AddWidget(widget)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, dashboard)
+	c.IndentedJSON(http.StatusCreated, widget)
 }
 
-func getDefaultDashboard(c *gin.Context) {
-	state := c.Query("meeting_state")
-	dashboard, err := service.GetDefaultDashboard(state)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
-	}
-
-	c.IndentedJSON(http.StatusOK, dashboard)
-}
-
-func addUserDashboard(c *gin.Context) {
-	claims, err1 := getClaimsFromAuthHeader(c)
-
-	if err1 != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
-		return
-	}
-
-	var dashboard model.Dashboard
-	if err := c.BindJSON(&dashboard); err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
-	}
-
-	dashboard, err := service.AddUserDashboard(dashboard, claims.Sub)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
-	}
-
-	c.IndentedJSON(http.StatusCreated, dashboard)
-}
-
-func removeUserDashboard(c *gin.Context) {
-	claims, err1 := getClaimsFromAuthHeader(c)
-
-	if err1 != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+func removeWidget(c *gin.Context) {
+	if failIfNotRoot(c) {
 		return
 	}
 
@@ -97,7 +57,7 @@ func removeUserDashboard(c *gin.Context) {
 		return
 	}
 
-	err := service.RemoveUserDashboard(id, claims.Sub)
+	err := service.RemoveWidget(id)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
