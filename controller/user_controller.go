@@ -17,6 +17,7 @@ import (
 func userController() {
 	router.GET("/users", getUsers)
 	router.GET("/user", getUser)
+	router.GET("/user/keycloak", getKcUser)
 	router.GET("/user/:id", getUserById)
 
 	router.POST("/user", addUser)
@@ -73,6 +74,30 @@ func getUser(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, user)
+}
+
+func getKcUser(c *gin.Context) {
+
+	claims, err1 := getClaimsFromAuthHeader(c)
+
+	if err1 != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+		return
+	}
+
+	user, err := service.GetUserByKeycloakId(claims.Sub)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	kcUser, err2 := service.GetKeycloakUser(user.KeycloakId)
+	if err2 != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, kcUser)
 }
 
 func getUserById(c *gin.Context) {
