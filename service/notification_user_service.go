@@ -97,3 +97,19 @@ func UpdateNotificationUser(user model.NotificationUser) (model.NotificationUser
 
 	return GetNotificationUserById(user.Identifier)
 }
+
+func RegisterNotificationUser(token string) (model.NotificationUser, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	user := model.NotificationUser{
+		Token: token,
+	}
+
+	r, err := notificationUserCollection.InsertOne(ctx, user)
+	if err != nil {
+		return model.NotificationUser{}, err
+	}
+
+	return GetNotificationUserById(r.InsertedID.(primitive.ObjectID))
+}

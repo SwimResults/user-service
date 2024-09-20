@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,12 +15,14 @@ func notificationUserController() {
 	router.GET("/user/:id", getNotificationUserById)
 
 	router.POST("/user", addNotificationUser)
+	router.POST("/user/register", registerNotificationUser)
 
 	router.DELETE("/user/:id", removeNotificationUser)
 
 	router.PUT("/user", updateNotificationUser)
 
 	router.OPTIONS("/user", okay)
+	router.OPTIONS("/user/register", okay)
 }
 
 func getNotificationUsers(c *gin.Context) {
@@ -139,6 +142,22 @@ func updateNotificationUser(c *gin.Context) {
 	r, err := service.UpdateNotificationUser(user)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, r)
+}
+
+func registerNotificationUser(c *gin.Context) {
+	var request dto.RegisterNotificationUserRequestDto
+	if err := c.BindJSON(&request); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	r, err := service.RegisterNotificationUser(request.Token)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
