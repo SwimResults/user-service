@@ -10,19 +10,19 @@ import (
 )
 
 func notificationUserController() {
-	router.GET("/users", getNotificationUsers)
-	router.GET("/user", getNotificationUser)
-	router.GET("/user/:id", getNotificationUserById)
+	router.GET("/notification_users", getNotificationUsers)
+	router.GET("/notification_user", getNotificationUser)
+	router.GET("/notification_user/:id", getNotificationUserById)
 
-	router.POST("/user", addNotificationUser)
-	router.POST("/user/register", registerNotificationUser)
+	router.POST("/notification_user", addNotificationUser)
+	router.POST("/notification_user/register", registerNotificationUser)
 
-	router.DELETE("/user/:id", removeNotificationUser)
+	router.DELETE("/notification_user/:id", removeNotificationUser)
 
-	router.PUT("/user", updateNotificationUser)
+	router.PUT("/notification_user", updateNotificationUser)
 
-	router.OPTIONS("/user", okay)
-	router.OPTIONS("/user/register", okay)
+	router.OPTIONS("/notification_user", okay)
+	router.OPTIONS("/notification_user/register", okay)
 }
 
 func getNotificationUsers(c *gin.Context) {
