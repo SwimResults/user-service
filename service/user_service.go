@@ -127,7 +127,7 @@ func ModifyFollowForUser(id uuid.UUID, athleteId primitive.ObjectID, follow bool
 	}
 
 	if follow {
-		user.Following = append(user.Following, model.Following{
+		user.Following = append(user.Following, model.FollowingAthlete{
 			AthleteId: athleteId,
 			AddedAt:   time.Now(),
 		})
