@@ -111,13 +111,16 @@ func RegisterNotificationUser(token string, device model.Device, user *model.Use
 	existing, err := GetNotificationUserByToken(token)
 	if err != nil {
 		if err.Error() == entryNotFoundMessage {
-			user := model.NotificationUser{
+			notificationUser := model.NotificationUser{
 				Token:  token,
 				Device: device,
-				UserId: user.Identifier,
 			}
 
-			r, err2 := notificationUserCollection.InsertOne(ctx, user)
+			if user != nil {
+				notificationUser.UserId = user.Identifier
+			}
+
+			r, err2 := notificationUserCollection.InsertOne(ctx, notificationUser)
 			if err2 != nil {
 				return model.NotificationUser{}, err2
 			}
