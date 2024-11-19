@@ -1,0 +1,3 @@
+-----BEGIN PRIVATE KEY-----
+### EXAMPLE FILE ###
+-----END PRIVATE KEY-----

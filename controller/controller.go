@@ -23,6 +23,7 @@ func Run() {
 	widgetController()
 	dashboardController()
 	notificationUserController()
+	notificationController()
 
 	router.GET("/actuator", actuator)
 
