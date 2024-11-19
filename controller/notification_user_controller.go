@@ -175,15 +175,13 @@ func registerNotificationUser(c *gin.Context) {
 
 	claims, err1 := getClaimsFromAuthHeader(c)
 
-	if err1 != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
-		return
-	}
-
-	user, err := service.GetUserByKeycloakId(claims.Sub)
-	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
-		return
+	var user model.User
+	if err1 == nil {
+		user, err1 = service.GetUserByKeycloakId(claims.Sub)
+		if err1 != nil {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+			return
+		}
 	}
 
 	r, err := service.RegisterNotificationUser(request.Token, request.Device, &user)
