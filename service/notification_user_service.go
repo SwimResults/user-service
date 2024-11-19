@@ -135,12 +135,12 @@ func RegisterNotificationUser(token string, device model.Device, user *model.Use
 			existing.UserId = user.Identifier
 		}
 
-		r, err2 := notificationUserCollection.ReplaceOne(ctx, bson.D{{"_id", existing.Identifier}}, existing)
+		_, err2 := notificationUserCollection.ReplaceOne(ctx, bson.D{{"_id", existing.Identifier}}, existing)
 		if err2 != nil {
 			return model.NotificationUser{}, err2
 		}
 
-		existing, _ = GetNotificationUserById(r.UpsertedID.(primitive.ObjectID))
+		existing, _ = GetNotificationUserById(existing.Identifier)
 	}
 
 	return existing, nil
