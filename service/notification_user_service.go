@@ -112,9 +112,8 @@ func RegisterNotificationUser(token string, device model.Device, user *model.Use
 	if err != nil {
 		if err.Error() == entryNotFoundMessage {
 			notificationUser := model.NotificationUser{
-				Identifier: primitive.NewObjectID(),
-				Token:      token,
-				Device:     device,
+				Token:  token,
+				Device: device,
 			}
 
 			if user != nil {
