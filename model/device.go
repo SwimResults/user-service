@@ -8,5 +8,6 @@ type Device struct {
 	SystemVersion  string `json:"system_version" bson:"system_version"`
 	Type           string `json:"type" bson:"type"`
 	UISize         string `json:"ui_size" bson:"ui_size"`
+	Language       string `json:"language" bson:"language"`
 	AppVersion     string `json:"app_version" bson:"app_version"`
 }
