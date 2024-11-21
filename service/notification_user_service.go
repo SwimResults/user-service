@@ -104,18 +104,26 @@ func UpdateNotificationUser(user model.NotificationUser) (model.NotificationUser
 
 // RegisterNotificationUser adds the given token to the database,
 // if the token already exists, it just returns the user
-func RegisterNotificationUser(token string) (model.NotificationUser, error) {
+func RegisterNotificationUser(token string, device model.Device, settings model.NotificationSettings, user *model.User) (model.NotificationUser, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	existing, err := GetNotificationUserByToken(token)
 	if err != nil {
 		if err.Error() == entryNotFoundMessage {
-			user := model.NotificationUser{
-				Token: token,
+			notificationUser := model.NotificationUser{
+				Token:     token,
+				Device:    device,
+				Settings:  settings,
+				AddedAt:   time.Now(),
+				UpdatedAt: time.Now(),
 			}
 
-			r, err2 := notificationUserCollection.InsertOne(ctx, user)
+			if user != nil {
+				notificationUser.UserId = user.Identifier
+			}
+
+			r, err2 := notificationUserCollection.InsertOne(ctx, notificationUser)
 			if err2 != nil {
 				return model.NotificationUser{}, err2
 			}
@@ -124,6 +132,20 @@ func RegisterNotificationUser(token string) (model.NotificationUser, error) {
 		} else {
 			return model.NotificationUser{}, err
 		}
+	} else {
+		existing.Device = device
+		existing.UpdatedAt = time.Now()
+		existing.Settings = settings
+		if user != nil {
+			existing.UserId = user.Identifier
+		}
+
+		_, err2 := notificationUserCollection.ReplaceOne(ctx, bson.D{{"_id", existing.Identifier}}, existing)
+		if err2 != nil {
+			return model.NotificationUser{}, err2
+		}
+
+		existing, _ = GetNotificationUserById(existing.Identifier)
 	}
 
 	return existing, nil

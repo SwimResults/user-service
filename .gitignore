@@ -5,6 +5,10 @@
 *.so
 *.dylib
 
+# private apns for apns
+*.p8
+!AuthKey.p8
+
 # Test binary, built with `go test -c`
 *.test
 

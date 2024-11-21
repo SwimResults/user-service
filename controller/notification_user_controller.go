@@ -15,7 +15,8 @@ func notificationUserController() {
 	router.GET("/notification_user/:id", getNotificationUserById)
 
 	router.POST("/notification_user", addNotificationUser)
-	router.POST("/notification_user/register", registerNotificationUser)
+	router.POST("/notification_user/register", registerNotificationUserWithoutToken)
+	router.POST("/notification_user/register/user", registerNotificationUser)
 
 	router.DELETE("/notification_user/:id", removeNotificationUser)
 
@@ -23,6 +24,7 @@ func notificationUserController() {
 
 	router.OPTIONS("/notification_user", okay)
 	router.OPTIONS("/notification_user/register", okay)
+	router.OPTIONS("/notification_user/register/user", okay)
 }
 
 func getNotificationUsers(c *gin.Context) {
@@ -148,6 +150,22 @@ func updateNotificationUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, r)
 }
 
+func registerNotificationUserWithoutToken(c *gin.Context) {
+	var request dto.RegisterNotificationUserRequestDto
+	if err := c.BindJSON(&request); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	r, err := service.RegisterNotificationUser(request.Token, request.Device, request.Settings, nil)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, r)
+}
+
 func registerNotificationUser(c *gin.Context) {
 	var request dto.RegisterNotificationUserRequestDto
 	if err := c.BindJSON(&request); err != nil {
@@ -155,7 +173,18 @@ func registerNotificationUser(c *gin.Context) {
 		return
 	}
 
-	r, err := service.RegisterNotificationUser(request.Token)
+	claims, err1 := getClaimsFromAuthHeader(c)
+
+	var user model.User
+	if err1 == nil {
+		user, err1 = service.GetUserByKeycloakId(claims.Sub)
+		if err1 != nil {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"message": err1.Error()})
+			return
+		}
+	}
+
+	r, err := service.RegisterNotificationUser(request.Token, request.Device, request.Settings, &user)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

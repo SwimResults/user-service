@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/swimresults/user-service/apns"
 	"github.com/swimresults/user-service/controller"
 	"github.com/swimresults/user-service/service"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,6 +17,7 @@ var client *mongo.Client
 
 func main() {
 	ctx := connectDB()
+	apns.Init()
 	service.Init(client)
 	controller.Run()
 
