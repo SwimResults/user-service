@@ -9,7 +9,9 @@ import (
 func notificationController() {
 
 	router.POST("/notification/test/:device", sendTestNotification)
+	router.POST("/notification/test/:device", sendTestNotification)
 
+	router.OPTIONS("/notification/test", okay)
 	router.OPTIONS("/notification/test", okay)
 }
 

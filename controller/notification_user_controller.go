@@ -157,7 +157,7 @@ func registerNotificationUserWithoutToken(c *gin.Context) {
 		return
 	}
 
-	r, err := service.RegisterNotificationUser(request.Token, request.Device, nil)
+	r, err := service.RegisterNotificationUser(request.Token, request.Device, request.Settings, nil)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -184,7 +184,7 @@ func registerNotificationUser(c *gin.Context) {
 		}
 	}
 
-	r, err := service.RegisterNotificationUser(request.Token, request.Device, &user)
+	r, err := service.RegisterNotificationUser(request.Token, request.Device, request.Settings, &user)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
