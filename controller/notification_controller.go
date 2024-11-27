@@ -11,7 +11,7 @@ func notificationController() {
 
 	router.POST("/notification/test/:device", sendTestNotification)
 	router.POST("/notification/:device", sendNotification)
-	router.POST("/notification/broadcast", sendBroadcast)
+	router.POST("/notification/broadcast/:channel", sendBroadcast)
 
 	router.OPTIONS("/notification/test/:device", okay)
 	router.OPTIONS("/notification/:device", okay)
@@ -66,13 +66,18 @@ func sendBroadcast(c *gin.Context) {
 		return
 	}
 
-	var request dto.BroadcastRequestDto
-	if err := c.BindJSON(&request); err != nil {
+	channel := c.Param("channel")
+
+	var content string
+	if err := c.Bind(&content); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	apnsRequestId, apnsUniqueId, body, status, err := service.SendPushBroadcast(request.Channel, request.Content)
+	print("channel: " + channel)
+	print("content: " + content)
+
+	apnsRequestId, apnsUniqueId, body, status, err := service.SendPushBroadcast(channel, content)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
