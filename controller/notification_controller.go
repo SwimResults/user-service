@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/service"
+	"io"
 	"net/http"
 )
 
@@ -68,16 +69,16 @@ func sendBroadcast(c *gin.Context) {
 
 	channel := c.Param("channel")
 
-	var content string
-	if err := c.Bind(&content); err != nil {
+	content, err := io.ReadAll(c.Request.Body)
+	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
 	print("channel: " + channel)
-	print("content: " + content)
+	print("content: " + string(content))
 
-	apnsRequestId, apnsUniqueId, body, status, err := service.SendPushBroadcast(channel, content)
+	apnsRequestId, apnsUniqueId, body, status, err := service.SendPushBroadcast(channel, string(content))
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
