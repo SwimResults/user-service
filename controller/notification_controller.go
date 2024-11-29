@@ -12,7 +12,9 @@ func notificationController() {
 
 	router.POST("/notification/test/:device", sendTestNotification)
 	router.POST("/notification/:device", sendNotification)
+
 	router.POST("/notification/broadcast/:channel", sendBroadcast)
+	router.POST("/notification/broadcast/meeting/:meeting", sendMeetingBroadcast)
 
 	router.OPTIONS("/notification/test/:device", okay)
 	router.OPTIONS("/notification/:device", okay)
@@ -79,6 +81,36 @@ func sendBroadcast(c *gin.Context) {
 	print("content: " + string(content))
 
 	apnsRequestId, apnsUniqueId, body, status, err := service.SendPushBroadcast(channel, string(content))
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(status, dto.BroadcastResponseDto{
+		ApnsRequestId: apnsRequestId,
+		ApnsUniqueId:  apnsUniqueId,
+		Body:          body,
+	})
+}
+
+func sendMeetingBroadcast(c *gin.Context) {
+
+	if failIfNotRoot(c) {
+		return
+	}
+
+	meeting := c.Param("meeting")
+
+	content, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	print("meeting: " + meeting)
+	print("content: " + string(content))
+
+	apnsRequestId, apnsUniqueId, body, status, err := service.SendPushMeetingBroadcast(meeting, string(content))
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

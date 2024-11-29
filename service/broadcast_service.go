@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/swimresults/user-service/apns"
 	"golang.org/x/net/http2"
@@ -10,6 +11,19 @@ import (
 	"strconv"
 	"time"
 )
+
+func SendPushMeetingBroadcast(meetingId string, content string) (string, string, string, int, error) {
+	meeting, err := GetMeetingById(meetingId)
+	if err != nil {
+		return "", "", "", 0, err
+	}
+
+	if meeting.Data.PushNotificationChannel == "" {
+		return "", "", "", 0, errors.New("meeting notification channel not set")
+	}
+
+	return SendPushBroadcast(meeting.Data.PushNotificationChannel, content)
+}
 
 func SendPushBroadcast(channel string, content string) (string, string, string, int, error) {
 	token := apns.GetToken()
