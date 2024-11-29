@@ -17,7 +17,7 @@ var mc = meetingClient.NewMeetingClient(meetingServiceUrl)
 
 var client *mongo.Client
 
-var meetings map[string]*meetingModel.Meeting
+var meetings = make(map[string]*meetingModel.Meeting)
 
 func Init(c *mongo.Client) {
 	database := c.Database(os.Getenv("SR_USER_MONGO_DATABASE"))
