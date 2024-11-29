@@ -78,6 +78,8 @@ github.com/swimresults/meeting-service v0.5.0 h1:RtSuEBVI5kSyl1aequJHGwa9BuoPnJ5
 github.com/swimresults/meeting-service v0.5.0/go.mod h1:60kU5gbAV253krD6q5nlLsyvFLTRcbA7zLHOXRSfkRA=
 github.com/swimresults/meeting-service v0.6.0 h1:VPlMgL6k0NXj1z4JNETq1uja/xWhN48y3InxHB8+vuM=
 github.com/swimresults/meeting-service v0.6.0/go.mod h1:60kU5gbAV253krD6q5nlLsyvFLTRcbA7zLHOXRSfkRA=
+github.com/swimresults/meeting-service v0.6.1 h1:iciwLewdFCH+BDFSKEBNwrffvnYCEk8JlxqLbvCb1nc=
+github.com/swimresults/meeting-service v0.6.1/go.mod h1:60kU5gbAV253krD6q5nlLsyvFLTRcbA7zLHOXRSfkRA=
 github.com/swimresults/service-core v0.4.0 h1:Fxbain4RlX4EACmhBkyJc7f/tDWx4IzzOf2JaXQMpho=
 github.com/swimresults/service-core v0.4.0/go.mod h1:VKQzdyiKKngHidX8bJpE4JpZpDq767r3slbhHcf0uGk=
 github.com/swimresults/service-core v0.5.0 h1:zF+/X9KWsVXgXdDfNFEKeryMGAxiXhstnKwL7Je/Rvw=
