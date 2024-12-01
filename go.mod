@@ -6,7 +6,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.3.1
-	github.com/swimresults/service-core v0.5.0
+	github.com/swimresults/service-core v0.6.0
 	go.mongodb.org/mongo-driver v1.10.0
 )
 
