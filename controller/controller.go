@@ -59,12 +59,16 @@ func actuator(c *gin.Context) {
 
 func checkServiceKey(c *gin.Context) error {
 	println("checking service key...")
-	fmt.Printf("received: '%s', expected: '%s'\n", c.Request.Header["X-SWIMRESULTS-SERVICE"][0], serviceKey)
-	if c.Request.Header["X-SWIMRESULTS-SERVICE"][0] == serviceKey {
+	received := c.Request.Header["X-SWIMRESULTS-SERVICE"]
+	fmt.Printf("received: '%s', expected: '%s'\n", received, serviceKey)
+	if len(received) <= 0 {
+		return errors.New("no service authorization key in header")
+	}
+	if received[0] == serviceKey {
 		return nil
 	}
 
-	return errors.New("no service authorization key in header")
+	return errors.New("invalid service authorization key in header")
 }
 
 func checkAuthHeaderToken(c *gin.Context) error {
