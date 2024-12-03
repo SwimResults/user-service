@@ -58,6 +58,8 @@ func actuator(c *gin.Context) {
 }
 
 func checkServiceKey(c *gin.Context) error {
+	println("checking service key...")
+	fmt.Printf("received: '%s', expected: '%s'\n", c.Request.Header["X-SWIMRESULTS-SERVICE"][0], serviceKey)
 	if c.Request.Header["X-SWIMRESULTS-SERVICE"][0] == serviceKey {
 		return nil
 	}
