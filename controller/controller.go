@@ -111,7 +111,8 @@ func getClaimsFromAuthHeader(c *gin.Context) (*model.TokenClaims, error) {
 }
 
 func checkIfRoot(c *gin.Context) error {
-	if checkServiceKey(c) == nil {
+	keyError := checkServiceKey(c)
+	if keyError == nil {
 		return nil
 	}
 
@@ -120,6 +121,7 @@ func checkIfRoot(c *gin.Context) error {
 	if tokenError == nil {
 		return nil
 	} else {
+		fmt.Printf("both auth checks for root failed: \n%s\n%s\n", keyError, tokenError)
 		return tokenError
 	}
 }
