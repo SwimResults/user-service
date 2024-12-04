@@ -96,8 +96,8 @@ func SendPushNotificationForMeeting(meeting string, title string, subtitle strin
 		wg.Add(1)
 		go func(receiver string, title string, subtitle string, message string, success *int) {
 			defer wg.Done()
-			_, _, _, err := SendPushNotification(receiver, title, subtitle, message)
-			if err == nil {
+			_, _, code, err := SendPushNotification(receiver, title, subtitle, message)
+			if err == nil || code == 200 {
 				*success++
 			}
 		}(user.Token, title, subtitle, message, &success)
@@ -129,6 +129,8 @@ func SendPushNotification(receiver string, title string, subtitle string, messag
 		}
 	`)
 
+	fmt.Printf("notifying user with token: '%s'\n", receiver)
+
 	r, err := http.NewRequest("POST", apnsUrl+"/3/device/"+receiver, bytes.NewBuffer(b))
 	if err != nil {
 		fmt.Println(err)
@@ -155,8 +157,8 @@ func SendPushNotification(receiver string, title string, subtitle string, messag
 	}
 	fmt.Println(string(body))
 
-	apnsID := resp.Header.Get("apns-id")
-	println("apns-id: " + apnsID)
+	apnsID := resp.Header.Get("apns-unique-id")
+	println("apns-unique-id: " + apnsID)
 
 	return apnsID, string(body), resp.StatusCode, nil
 }
