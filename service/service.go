@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	athleteClient "github.com/swimresults/athlete-service/client"
 	meetingClient "github.com/swimresults/meeting-service/client"
 	meetingModel "github.com/swimresults/meeting-service/model"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,8 +13,10 @@ import (
 )
 
 var meetingServiceUrl = os.Getenv("SR_USER_MEETING_URL")
+var athleteServiceUrl = os.Getenv("SR_USER_ATHLETE_URL")
 
 var mc = meetingClient.NewMeetingClient(meetingServiceUrl)
+var ac = athleteClient.NewAthleteClient(athleteServiceUrl)
 
 var client *mongo.Client
 

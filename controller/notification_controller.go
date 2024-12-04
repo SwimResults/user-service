@@ -12,6 +12,7 @@ func notificationController() {
 
 	router.POST("/notification/test/:device", sendTestNotification)
 	router.POST("/notification/:device", sendNotification)
+	router.POST("/notification/meet/:meeting", sendNotificationForMeeting)
 
 	router.POST("/notification/broadcast/:channel", sendBroadcast)
 	router.POST("/notification/broadcast/meeting/:meeting", sendMeetingBroadcast)
@@ -60,6 +61,32 @@ func sendNotification(c *gin.Context) {
 	c.IndentedJSON(status, dto.NotificationResponseDto{
 		ApnsId: apnsId,
 		Body:   body,
+	})
+}
+
+func sendNotificationForMeeting(c *gin.Context) {
+
+	if failIfNotRoot(c) {
+		return
+	}
+
+	meeting := c.Param("meeting")
+
+	var request dto.NotificationRequestDto
+	if err := c.BindJSON(&request); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	users, notificationUsers, err := service.SendPushNotificationForMeeting(meeting, request.Title, request.Subtitle, request.Message)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, dto.NotificationsResponseDto{
+		UserCount:             users,
+		NotificationUserCount: notificationUsers,
 	})
 }
 

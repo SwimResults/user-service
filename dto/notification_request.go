@@ -10,3 +10,8 @@ type NotificationResponseDto struct {
 	ApnsId string `json:"apns_id"`
 	Body   string `json:"body"`
 }
+
+type NotificationsResponseDto struct {
+	UserCount             int `json:"user_count"`
+	NotificationUserCount int `json:"notification_user_count"`
+}

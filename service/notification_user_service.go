@@ -66,6 +66,10 @@ func GetNotificationUserByToken(token string) (model.NotificationUser, error) {
 	return getNotificationUserByBsonDocument(bson.D{{"token", token}})
 }
 
+func GetNotificationUsersByUserIds(userIds []primitive.ObjectID) ([]model.NotificationUser, error) {
+	return getNotificationUsersByBsonDocument(bson.M{"user_id": bson.M{"$in": userIds}})
+}
+
 func RemoveNotificationUserById(id primitive.ObjectID) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

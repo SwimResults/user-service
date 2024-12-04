@@ -66,6 +66,15 @@ func GetUserById(id primitive.ObjectID) (model.User, error) {
 	return getUserByBsonDocument(bson.D{{"_id", id}})
 }
 
+func GetUsersByIsFollowerOrMe(athleteIds []primitive.ObjectID) ([]model.User, error) {
+	return getUsersByBsonDocument(bson.M{
+		"$or": []interface{}{
+			bson.M{"own_athlete_id": bson.M{"$in": athleteIds}},
+			bson.M{"following.athlete_id": athleteIds},
+		},
+	})
+}
+
 // GetUserByKeycloakId gets a user by keycloak id, creates new one if not existing so far
 func GetUserByKeycloakId(id uuid.UUID) (model.User, error) {
 	user, err := getUserByBsonDocument(bson.D{{"keycloak_id", id.String()}})
