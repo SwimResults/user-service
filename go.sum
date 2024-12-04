@@ -86,6 +86,8 @@ github.com/swimresults/meeting-service v0.6.3 h1:KOsAKlZgr98gc+g09+thdsMJujFHKyK
 github.com/swimresults/meeting-service v0.6.3/go.mod h1:60kU5gbAV253krD6q5nlLsyvFLTRcbA7zLHOXRSfkRA=
 github.com/swimresults/meeting-service v0.7.0 h1:093JkcjTxr1g2FbW63gQE3S5j8FtK/W2jzGbpLCyXTk=
 github.com/swimresults/meeting-service v0.7.0/go.mod h1:0EkmjTmds7O+Xz8e4zn5opX6bZHVrp13h7c6pgBVCHA=
+github.com/swimresults/meeting-service v0.7.1 h1:3PtRDBZO1JPk4Mvf2N8xsfT+1r/7AG+7anlo3FNNnEY=
+github.com/swimresults/meeting-service v0.7.1/go.mod h1:CMlCDEdbyLxA3MblOIvfxzD64hUKkYdSwfsupc+GLW4=
 github.com/swimresults/service-core v0.4.0 h1:Fxbain4RlX4EACmhBkyJc7f/tDWx4IzzOf2JaXQMpho=
 github.com/swimresults/service-core v0.4.0/go.mod h1:VKQzdyiKKngHidX8bJpE4JpZpDq767r3slbhHcf0uGk=
 github.com/swimresults/service-core v0.5.0 h1:zF+/X9KWsVXgXdDfNFEKeryMGAxiXhstnKwL7Je/Rvw=
@@ -94,6 +96,8 @@ github.com/swimresults/service-core v0.6.0 h1:K+mzSwMHOWfy2uCa5gYXA+nFN24RavLFwE
 github.com/swimresults/service-core v0.6.0/go.mod h1:PnaIA/xlyf4GpsYHE7yj5HDFdbiq/VSEvqgj27VfqTQ=
 github.com/swimresults/service-core v0.6.1 h1:f5HLfmvHRMBMKACpTZ/CgatHlIVAc2xWracwmLMnKb0=
 github.com/swimresults/service-core v0.6.1/go.mod h1:PnaIA/xlyf4GpsYHE7yj5HDFdbiq/VSEvqgj27VfqTQ=
+github.com/swimresults/service-core v0.6.2 h1:eBUvXJMbCdTbo6HCbPHuN8W0K3UTlSwoG/GwYMbXt/s=
+github.com/swimresults/service-core v0.6.2/go.mod h1:PnaIA/xlyf4GpsYHE7yj5HDFdbiq/VSEvqgj27VfqTQ=
 github.com/tidwall/pretty v1.0.0 h1:HsD+QiTn7sK6flMKIvNmpqz1qrpP3Ps6jOKIKMooyg4=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
