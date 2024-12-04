@@ -45,6 +45,8 @@ func SendPushBroadcast(channel string, content string) (string, string, string, 
 		}
 	`)
 
+	fmt.Printf("sending to '%s': \n%s\n", apnsUrl, string(b))
+
 	r, err := http.NewRequest("POST", apnsUrl+"/4/broadcasts/apps/de.logilutions.SwimResults", bytes.NewBuffer(b))
 	if err != nil {
 		fmt.Println(err)
