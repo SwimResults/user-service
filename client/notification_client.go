@@ -45,7 +45,7 @@ func (c *NotificationClient) SendNotification(key string, meeting string, title 
 }
 
 func (c *NotificationClient) SendMeetingBroadcastNotification(key string, meeting string, body string) (*dto.BroadcastResponseDto, error) {
-	fmt.Printf("sending meeting broadcast request to: '%s'", "notification/broadcast/meeting/"+meeting)
+	fmt.Printf("sending meeting broadcast request to: '%s'\n", "notification/broadcast/meeting/"+meeting)
 
 	header := http.Header{}
 	header.Set("X-SWIMRESULTS-SERVICE", key)

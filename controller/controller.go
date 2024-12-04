@@ -59,7 +59,7 @@ func actuator(c *gin.Context) {
 
 func checkServiceKey(c *gin.Context) error {
 	println("checking service key...")
-	received := c.Request.Header["X-SWIMRESULTS-SERVICE"]
+	received := c.Request.Header["X-Swimresults-Service"]
 	fmt.Printf("received: '%s', expected: '%s'\n", received, serviceKey)
 	if len(received) <= 0 {
 		return errors.New("no service authorization key in header")
