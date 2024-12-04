@@ -14,4 +14,5 @@ type NotificationResponseDto struct {
 type NotificationsResponseDto struct {
 	UserCount             int `json:"user_count"`
 	NotificationUserCount int `json:"notification_user_count"`
+	SuccessCount          int `json:"success_count"`
 }

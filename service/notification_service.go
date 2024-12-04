@@ -63,10 +63,10 @@ func SendTestPushNotification(receiver string) error {
 	return nil
 }
 
-func SendPushNotificationForMeeting(meeting string, title string, subtitle string, message string) (int, int, error) {
+func SendPushNotificationForMeeting(meeting string, title string, subtitle string, message string) (int, int, int, error) {
 	athletes, err := ac.GetAthletesByMeeting(meeting)
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, 0, err
 	}
 
 	var athleteIds []primitive.ObjectID
@@ -76,7 +76,7 @@ func SendPushNotificationForMeeting(meeting string, title string, subtitle strin
 
 	users, err := GetUsersByIsFollowerOrMe(athleteIds)
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, 0, err
 	}
 
 	var userIds []primitive.ObjectID
@@ -86,7 +86,7 @@ func SendPushNotificationForMeeting(meeting string, title string, subtitle strin
 
 	notificationUsers, err := GetNotificationUsersByUserIds(userIds)
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, 0, err
 	}
 
 	var wg sync.WaitGroup
@@ -106,7 +106,7 @@ func SendPushNotificationForMeeting(meeting string, title string, subtitle strin
 	wg.Wait() // Wait for all goroutines to finish
 
 	fmt.Printf("notified %d users with %d/%d devices", len(users), success, len(notificationUsers))
-	return len(users), success, nil
+	return len(users), len(notificationUsers), success, nil
 }
 
 func SendPushNotification(receiver string, title string, subtitle string, message string) (string, string, int, error) {

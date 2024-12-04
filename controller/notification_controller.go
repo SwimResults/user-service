@@ -78,7 +78,7 @@ func sendNotificationForMeeting(c *gin.Context) {
 		return
 	}
 
-	users, notificationUsers, err := service.SendPushNotificationForMeeting(meeting, request.Title, request.Subtitle, request.Message)
+	users, notificationUsers, success, err := service.SendPushNotificationForMeeting(meeting, request.Title, request.Subtitle, request.Message)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -87,6 +87,7 @@ func sendNotificationForMeeting(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, dto.NotificationsResponseDto{
 		UserCount:             users,
 		NotificationUserCount: notificationUsers,
+		SuccessCount:          success,
 	})
 }
 
