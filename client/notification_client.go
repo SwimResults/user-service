@@ -44,7 +44,7 @@ func (c *NotificationClient) SendNotification(key string, meeting string, title 
 	return responseDto, nil
 }
 
-func (c *NotificationClient) SendMeetingBroadcastNotification(key string, meeting string, body string) (*dto.BroadcastResponseDto, error) {
+func (c *NotificationClient) SendMeetingBroadcastNotification(key string, meeting string, body interface{}) (*dto.BroadcastResponseDto, error) {
 	fmt.Printf("sending meeting broadcast request to: '%s'\n", "notification/broadcast/meeting/"+meeting)
 
 	header := http.Header{}
