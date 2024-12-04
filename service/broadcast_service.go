@@ -38,9 +38,7 @@ func SendPushBroadcast(channel string, content string) (string, string, string, 
 			"aps": {
 				"timestamp": ` + strconv.Itoa(int(time.Now().Unix())) + `,
 				"event": "update",
-				"content-state": {
-					` + content + `
-				}
+				"content-state": ` + content + `
 			}
 		}
 	`)
