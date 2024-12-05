@@ -57,7 +57,7 @@ func getNotificationUser(c *gin.Context) {
 		return
 	}
 
-	notificationUser, err2 := service.GetNotificationUserById(user.Identifier)
+	notificationUser, err2 := service.GetNotificationUserByUserId(user.Identifier)
 	if err2 != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err2.Error()})
 		return

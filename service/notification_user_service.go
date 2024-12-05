@@ -62,6 +62,10 @@ func GetNotificationUserById(id primitive.ObjectID) (model.NotificationUser, err
 	return getNotificationUserByBsonDocument(bson.D{{"_id", id}})
 }
 
+func GetNotificationUserByUserId(id primitive.ObjectID) (model.NotificationUser, error) {
+	return getNotificationUserByBsonDocument(bson.D{{"user_id", id}})
+}
+
 func GetNotificationUserByToken(token string) (model.NotificationUser, error) {
 	return getNotificationUserByBsonDocument(bson.D{{"token", token}})
 }
