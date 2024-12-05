@@ -10,9 +10,11 @@ import (
 )
 
 func notificationUserController() {
+	router.GET("/notification_user/public/token/:token", getNotificationUserByToken)
+	router.POST("/notification_user/public/register", registerNotificationUserWithoutToken)
+
 	router.GET("/notification_users", getNotificationUsers)
 	router.GET("/notification_user", getNotificationUser)
-	router.GET("/notification_user/token/:token", getNotificationUserByToken)
 	router.GET("/notification_user/:id", getNotificationUserById)
 
 	router.POST("/notification_user", addNotificationUser)
