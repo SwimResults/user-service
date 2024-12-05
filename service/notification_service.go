@@ -65,20 +65,10 @@ func SendTestPushNotification(receiver string) error {
 	return nil
 }
 
-func SendPushNotificationForMeeting(meetingId string, request dto.MeetingNotificationRequestDto) (int, int, int, error) {
+func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []primitive.ObjectID, request dto.MeetingNotificationRequestDto) (int, int, int, error) {
 	meeting, err := GetMeetingById(meetingId)
 	if err != nil {
 		return 0, 0, 0, err
-	}
-
-	athletes, err := ac.GetAthletesByMeeting(meetingId)
-	if err != nil {
-		return 0, 0, 0, err
-	}
-
-	var athleteIds []primitive.ObjectID
-	for _, athlete := range athletes {
-		athleteIds = append(athleteIds, athlete.Identifier)
 	}
 
 	var users []model.User
@@ -127,6 +117,20 @@ func SendPushNotificationForMeeting(meetingId string, request dto.MeetingNotific
 
 	fmt.Printf("notified %d users with %d/%d devices", len(users), success, len(notificationUsers))
 	return len(users), len(notificationUsers), success, nil
+}
+
+func SendPushNotificationForMeeting(meetingId string, request dto.MeetingNotificationRequestDto) (int, int, int, error) {
+	athletes, err := ac.GetAthletesByMeeting(meetingId)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	var athleteIds []primitive.ObjectID
+	for _, athlete := range athletes {
+		athleteIds = append(athleteIds, athlete.Identifier)
+	}
+
+	return SendPushNotificationForMeetingAndAthletes(meetingId, athleteIds, request)
 }
 
 func SendPushNotification(receiver string, title string, subtitle string, message string, interruptionLevel string) (string, string, int, error) {

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/service"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io"
 	"net/http"
 )
@@ -13,6 +14,7 @@ func notificationController() {
 	router.POST("/notification/test/:device", sendTestNotification)
 	router.POST("/notification/:device", sendNotification)
 	router.POST("/notification/meet/:meeting", sendNotificationForMeeting)
+	router.POST("/notification/meet/:meeting/athlete/:athlete", sendNotificationForMeetingAndAthlete)
 
 	router.POST("/notification/broadcast/:channel", sendBroadcast)
 	router.POST("/notification/broadcast/meeting/:meeting", sendMeetingBroadcast)
@@ -72,6 +74,11 @@ func sendNotificationForMeeting(c *gin.Context) {
 
 	meeting := c.Param("meeting")
 
+	if meeting == "" {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "no meeting given"})
+		return
+	}
+
 	var request dto.MeetingNotificationRequestDto
 	if err := c.BindJSON(&request); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -79,6 +86,44 @@ func sendNotificationForMeeting(c *gin.Context) {
 	}
 
 	users, notificationUsers, success, err := service.SendPushNotificationForMeeting(meeting, request)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, dto.NotificationsResponseDto{
+		UserCount:             users,
+		NotificationUserCount: notificationUsers,
+		SuccessCount:          success,
+	})
+}
+
+func sendNotificationForMeetingAndAthlete(c *gin.Context) {
+
+	if failIfNotRoot(c) {
+		return
+	}
+
+	meeting := c.Param("meeting")
+
+	if meeting == "" {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "no meeting given"})
+		return
+	}
+
+	athleteId, convErr := primitive.ObjectIDFromHex(c.Param("athlete"))
+	if convErr != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given athlete was not of type ObjectID"})
+		return
+	}
+
+	var request dto.MeetingNotificationRequestDto
+	if err := c.BindJSON(&request); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	users, notificationUsers, success, err := service.SendPushNotificationForMeetingAndAthletes(meeting, []primitive.ObjectID{athleteId}, request)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
