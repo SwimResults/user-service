@@ -4,10 +4,14 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/swimresults/user-service/apns"
+	"github.com/swimresults/user-service/dto"
+	"github.com/swimresults/user-service/model"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/net/http2"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sync"
 )
 
 var apnsUrl = os.Getenv("SR_APNS_URL")
@@ -61,12 +65,84 @@ func SendTestPushNotification(receiver string) error {
 	return nil
 }
 
-func SendPushNotification(receiver string, title string, subtitle string, message string) (string, string, int, error) {
+func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []primitive.ObjectID, request dto.MeetingNotificationRequestDto) (int, int, int, error) {
+	meeting, err := GetMeetingById(meetingId)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	var users []model.User
+	var err1 error
+	if request.MessageType == "athlete" {
+		users, err1 = GetUsersByIsMe(athleteIds)
+	} else if request.MessageType == "favourites" {
+		users, err1 = GetUsersByIsFollower(athleteIds)
+	} else {
+		users, err1 = GetUsersByIsFollowerOrMe(athleteIds)
+	}
+
+	if err1 != nil {
+		return 0, 0, 0, err
+	}
+
+	var userIds []primitive.ObjectID
+	for _, user := range users {
+		userIds = append(userIds, user.Identifier)
+	}
+
+	notificationUsers, err := GetNotificationUsersByUserIds(userIds)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	var wg sync.WaitGroup
+
+	success := 0
+	for _, user := range notificationUsers {
+		if !user.HasSetting(request.MessageType) {
+			continue
+		}
+
+		wg.Add(1)
+		go func(receiver string, title string, subtitle string, message string, interruptionLevel string, success *int) {
+			defer wg.Done()
+			_, _, code, err := SendPushNotification(receiver, title, subtitle, message, interruptionLevel)
+			if err == nil || code == 200 {
+				*success++
+			}
+		}(user.Token, meeting.Series.NameMedium, request.Subtitle, request.Message, request.InterruptionLevel, &success)
+	}
+
+	wg.Wait() // Wait for all goroutines to finish
+
+	fmt.Printf("notified %d users with %d/%d devices", len(users), success, len(notificationUsers))
+	return len(users), len(notificationUsers), success, nil
+}
+
+func SendPushNotificationForMeeting(meetingId string, request dto.MeetingNotificationRequestDto) (int, int, int, error) {
+	athletes, err := ac.GetAthletesByMeeting(meetingId)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	var athleteIds []primitive.ObjectID
+	for _, athlete := range athletes {
+		athleteIds = append(athleteIds, athlete.Identifier)
+	}
+
+	return SendPushNotificationForMeetingAndAthletes(meetingId, athleteIds, request)
+}
+
+func SendPushNotification(receiver string, title string, subtitle string, message string, interruptionLevel string) (string, string, int, error) {
 	token := apns.GetToken()
 
 	t := &http2.Transport{}
 	c := &http.Client{
 		Transport: t,
+	}
+
+	if interruptionLevel == "" {
+		interruptionLevel = "active"
 	}
 
 	b := []byte(`
@@ -76,10 +152,13 @@ func SendPushNotification(receiver string, title string, subtitle string, messag
 					"title": "` + title + `",
 					"subtitle": "` + subtitle + `",
 					"body": "` + message + `"
-				}
+				},
+				"interruption-level": "` + interruptionLevel + `"
 			}
 		}
 	`)
+
+	fmt.Printf("notifying user with token: '%s'\n", receiver)
 
 	r, err := http.NewRequest("POST", apnsUrl+"/3/device/"+receiver, bytes.NewBuffer(b))
 	if err != nil {
@@ -107,8 +186,8 @@ func SendPushNotification(receiver string, title string, subtitle string, messag
 	}
 	fmt.Println(string(body))
 
-	apnsID := resp.Header.Get("apns-id")
-	println("apns-id: " + apnsID)
+	apnsID := resp.Header.Get("apns-unique-id")
+	println("apns-unique-id: " + apnsID)
 
 	return apnsID, string(body), resp.StatusCode, nil
 }
