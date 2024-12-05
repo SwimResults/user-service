@@ -12,6 +12,7 @@ import (
 func notificationUserController() {
 	router.GET("/notification_users", getNotificationUsers)
 	router.GET("/notification_user", getNotificationUser)
+	router.GET("/notification_user/token/:token", getNotificationUserByToken)
 	router.GET("/notification_user/:id", getNotificationUserById)
 
 	router.POST("/notification_user", addNotificationUser)
@@ -58,6 +59,24 @@ func getNotificationUser(c *gin.Context) {
 	}
 
 	notificationUser, err2 := service.GetNotificationUserByUserId(user.Identifier)
+	if err2 != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err2.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, notificationUser)
+}
+
+func getNotificationUserByToken(c *gin.Context) {
+
+	token := c.Param("token")
+
+	if token == "" {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "no token given"})
+		return
+	}
+
+	notificationUser, err2 := service.GetNotificationUserByToken(token)
 	if err2 != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err2.Error()})
 		return
