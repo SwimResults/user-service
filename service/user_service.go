@@ -70,7 +70,7 @@ func GetUsersByIsFollowerOrMe(athleteIds []primitive.ObjectID) ([]model.User, er
 	return getUsersByBsonDocument(bson.M{
 		"$or": []interface{}{
 			bson.M{"own_athlete_id": bson.M{"$in": athleteIds}},
-			bson.M{"following.athlete_id": athleteIds},
+			bson.M{"following.athlete_id": bson.M{"$in": athleteIds}},
 		},
 	})
 }
@@ -78,7 +78,7 @@ func GetUsersByIsFollowerOrMe(athleteIds []primitive.ObjectID) ([]model.User, er
 func GetUsersByIsFollower(athleteIds []primitive.ObjectID) ([]model.User, error) {
 	return getUsersByBsonDocument(bson.M{
 		"$or": []interface{}{
-			bson.M{"following.athlete_id": athleteIds},
+			bson.M{"following.athlete_id": bson.M{"$in": athleteIds}},
 		},
 	})
 }

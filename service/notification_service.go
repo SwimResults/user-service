@@ -148,7 +148,8 @@ func SendPushNotification(receiver string, title string, subtitle string, messag
 					"title": "` + title + `",
 					"subtitle": "` + subtitle + `",
 					"body": "` + message + `"
-				}
+				},
+				"interruption-level": "` + interruptionLevel + `"
 			}
 		}
 	`)
