@@ -52,7 +52,7 @@ func sendNotification(c *gin.Context) {
 		return
 	}
 
-	apnsId, body, status, err := service.SendPushNotification(device, request.Title, request.Subtitle, request.Message)
+	apnsId, body, status, err := service.SendPushNotification(device, request.Title, request.Subtitle, request.Message, request.InterruptionLevel)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -72,13 +72,13 @@ func sendNotificationForMeeting(c *gin.Context) {
 
 	meeting := c.Param("meeting")
 
-	var request dto.NotificationRequestDto
+	var request dto.MeetingNotificationRequestDto
 	if err := c.BindJSON(&request); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	users, notificationUsers, success, err := service.SendPushNotificationForMeeting(meeting, request.Title, request.Subtitle, request.Message)
+	users, notificationUsers, success, err := service.SendPushNotificationForMeeting(meeting, request)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

@@ -21,3 +21,18 @@ type NotificationSettings struct {
 	Meeting    bool `json:"meeting" bson:"meeting"`
 	Schedule   bool `json:"schedule" bson:"schedule"`
 }
+
+func (user *NotificationUser) HasSetting(notificationType string) bool {
+	switch notificationType {
+	case "athlete":
+		return user.Settings.Athlete
+	case "favourites":
+		return user.Settings.Favourites
+	case "meeting":
+		return user.Settings.Meeting
+	case "schedule":
+		return user.Settings.Schedule
+
+	}
+	return false
+}
