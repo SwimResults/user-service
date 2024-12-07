@@ -56,7 +56,7 @@ func (c *NotificationClient) SendNotificationForMeetingAndAthlete(key string, me
 	header := http.Header{}
 	header.Set("X-SWIMRESULTS-SERVICE", key)
 
-	res, err := client.Post(c.apiUrl, "/notification/meet/"+meeting+"/athlete/"+athleteId.Hex(), request, &header)
+	res, err := client.Post(c.apiUrl, "notification/meet/"+meeting+"/athlete/"+athleteId.Hex(), request, &header)
 	if err != nil {
 		return nil, err
 	}
