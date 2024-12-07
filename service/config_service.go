@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/swimresults/user-service/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -74,6 +75,7 @@ func AddConfig(config model.Config) (model.Config, error) {
 }
 
 func DisableNotification(meeting string, enabled bool) (*model.Config, error) {
+	fmt.Printf("set notification for meeting %s to %t", meeting, enabled)
 	config, err := GetStoredConfigByMeeting(meeting)
 	if err != nil {
 		return nil, err
