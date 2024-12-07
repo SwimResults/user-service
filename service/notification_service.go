@@ -72,6 +72,7 @@ func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []pr
 	}
 
 	athleteIds = append(athleteIds, primitive.NewObjectID())
+	athleteIds = append(athleteIds, primitive.NewObjectID())
 
 	var users []model.User
 	var err1 error
@@ -119,7 +120,7 @@ func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []pr
 
 	wg.Wait() // Wait for all goroutines to finish
 
-	fmt.Printf("notified %d users with %d/%d devices", len(users), success, len(notificationUsers))
+	fmt.Printf("notified %d users with %d/%d devices\n", len(users), success, len(notificationUsers))
 	return len(users), len(notificationUsers), success, nil
 }
 
