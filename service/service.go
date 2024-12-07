@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	athleteClient "github.com/swimresults/athlete-service/client"
 	meetingClient "github.com/swimresults/meeting-service/client"
 	meetingModel "github.com/swimresults/meeting-service/model"
+	"github.com/swimresults/user-service/model"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"os"
@@ -21,12 +23,14 @@ var ac = athleteClient.NewAthleteClient(athleteServiceUrl)
 var client *mongo.Client
 
 var meetings = make(map[string]*meetingModel.Meeting)
+var configs = make(map[string]*model.Config)
 
 func Init(c *mongo.Client) {
 	database := c.Database(os.Getenv("SR_USER_MONGO_DATABASE"))
 	client = c
 
 	InitMeetings()
+	InitConfigs()
 
 	userService(database)
 	widgetService(database)
@@ -37,7 +41,7 @@ func Init(c *mongo.Client) {
 func GetMeetingById(id string) (*meetingModel.Meeting, error) {
 	existing := meetings[id]
 	if existing != nil {
-		fmt.Printf("returning cached meeting: %s", id)
+		fmt.Printf("returning cached meeting: %s\n", id)
 		return existing, nil
 	}
 	meeting, err := mc.GetMeetingById(id)
@@ -50,6 +54,20 @@ func GetMeetingById(id string) (*meetingModel.Meeting, error) {
 	return meeting, nil
 }
 
+func GetStoredConfigByMeeting(meeting string) (*model.Config, error) {
+	existing := configs[meeting]
+	if existing != nil {
+		fmt.Printf("returning cached config: %s\n", meeting)
+		return existing, nil
+	}
+
+	return nil, errors.New("no config found")
+}
+
+func UpdateStoredConfigByMeeting(meeting string, config model.Config) {
+	configs[meeting] = &config
+}
+
 func InitMeetings() {
 	meetingList, err := mc.GetMeetings()
 	if err != nil {
@@ -59,6 +77,18 @@ func InitMeetings() {
 
 	for _, meeting := range meetingList {
 		meetings[meeting.MeetId] = &meeting
+	}
+}
+
+func InitConfigs() {
+	configList, err := GetConfigs()
+	if err != nil {
+		fmt.Printf("Failed loading meetings: %s", err.Error())
+		return
+	}
+
+	for _, config := range configList {
+		configs[config.Meeting] = &config
 	}
 }
 

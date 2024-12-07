@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/swimresults/user-service/apns"
 	"github.com/swimresults/user-service/dto"
@@ -66,6 +67,16 @@ func SendTestPushNotification(receiver string) error {
 }
 
 func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []primitive.ObjectID, request dto.MeetingNotificationRequestDto) (int, int, int, error) {
+	config, err := GetStoredConfigByMeeting(meetingId)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	if config.Enabled == false {
+		fmt.Printf("notifications are diabled for %s\n", meetingId)
+		return 0, 0, 0, errors.New("notifications are disabled for " + meetingId)
+	}
+
 	meeting, err := GetMeetingById(meetingId)
 	if err != nil {
 		return 0, 0, 0, err
