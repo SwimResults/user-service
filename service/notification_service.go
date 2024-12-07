@@ -71,7 +71,7 @@ func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []pr
 		return 0, 0, 0, err
 	}
 
-	athleteIds = append(athleteIds, primitive.ObjectID{})
+	athleteIds = append(athleteIds, primitive.NewObjectID())
 
 	var users []model.User
 	var err1 error
