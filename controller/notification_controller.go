@@ -127,7 +127,7 @@ func sendNotificationForMeetingAndAthlete(c *gin.Context) {
 
 	users, notificationUsers, success, err := service.SendPushNotificationForMeetingAndAthletes(meeting, []primitive.ObjectID{athleteId}, request)
 	if err != nil {
-		fmt.Printf("sendNotificationForMeetingAndAthlete failed: %d\n", err)
+		fmt.Printf("sendNotificationForMeetingAndAthlete failed: %s\n", err.Error())
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
