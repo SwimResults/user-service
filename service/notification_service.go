@@ -71,6 +71,8 @@ func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []pr
 		return 0, 0, 0, err
 	}
 
+	athleteIds = append(athleteIds, primitive.ObjectID{})
+
 	var users []model.User
 	var err1 error
 	if request.MessageType == "athlete" {
