@@ -26,6 +26,8 @@ func Init(c *mongo.Client) {
 	database := c.Database(os.Getenv("SR_USER_MONGO_DATABASE"))
 	client = c
 
+	InitMeetings()
+
 	userService(database)
 	widgetService(database)
 	dashboardService(database)
@@ -46,6 +48,18 @@ func GetMeetingById(id string) (*meetingModel.Meeting, error) {
 	meetings[id] = meeting
 
 	return meeting, nil
+}
+
+func InitMeetings() {
+	meetingList, err := mc.GetMeetings()
+	if err != nil {
+		fmt.Printf("Failed loading meetings: %s", err.Error())
+		return
+	}
+
+	for _, meeting := range meetingList {
+		meetings[meeting.MeetId] = &meeting
+	}
 }
 
 func PingDatabase() bool {

@@ -71,6 +71,9 @@ func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []pr
 		return 0, 0, 0, err
 	}
 
+	athleteIds = append(athleteIds, primitive.NewObjectID())
+	athleteIds = append(athleteIds, primitive.NewObjectID())
+
 	var users []model.User
 	var err1 error
 	if request.MessageType == "athlete" {
@@ -86,6 +89,8 @@ func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []pr
 	}
 
 	var userIds []primitive.ObjectID
+	userIds = append(userIds, primitive.NewObjectID())
+	userIds = append(userIds, primitive.NewObjectID())
 	for _, user := range users {
 		userIds = append(userIds, user.Identifier)
 	}
@@ -115,7 +120,7 @@ func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []pr
 
 	wg.Wait() // Wait for all goroutines to finish
 
-	fmt.Printf("notified %d users with %d/%d devices", len(users), success, len(notificationUsers))
+	fmt.Printf("notified %d users with %d/%d devices\n", len(users), success, len(notificationUsers))
 	return len(users), len(notificationUsers), success, nil
 }
 
