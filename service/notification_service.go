@@ -88,6 +88,8 @@ func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []pr
 	}
 
 	var userIds []primitive.ObjectID
+	userIds = append(userIds, primitive.NewObjectID())
+	userIds = append(userIds, primitive.NewObjectID())
 	for _, user := range users {
 		userIds = append(userIds, user.Identifier)
 	}
