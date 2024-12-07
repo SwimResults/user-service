@@ -61,6 +61,18 @@ func GetConfigs() ([]model.Config, error) {
 	return getConfigsByBsonDocument(bson.M{})
 }
 
+func AddConfig(config model.Config) (model.Config, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := configCollection.InsertOne(ctx, config)
+	if err != nil {
+		return model.Config{}, err
+	}
+
+	return GetConfigByMeeting(config.Meeting)
+}
+
 func DisableNotification(meeting string, enabled bool) (*model.Config, error) {
 	config, err := GetStoredConfigByMeeting(meeting)
 	if err != nil {
