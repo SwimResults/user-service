@@ -30,13 +30,14 @@ func Init(c *mongo.Client) {
 	client = c
 
 	InitMeetings()
-	InitConfigs()
 
 	userService(database)
 	widgetService(database)
 	dashboardService(database)
 	notificationUserService(database)
 	configService(database)
+
+	InitConfigs()
 }
 
 func GetMeetingById(id string) (*meetingModel.Meeting, error) {
