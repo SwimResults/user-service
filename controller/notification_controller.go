@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/service"
@@ -119,12 +120,14 @@ func sendNotificationForMeetingAndAthlete(c *gin.Context) {
 
 	var request dto.MeetingNotificationRequestDto
 	if err := c.BindJSON(&request); err != nil {
+		println("binding MeetingNotificationRequestDto failed")
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
 	users, notificationUsers, success, err := service.SendPushNotificationForMeetingAndAthletes(meeting, []primitive.ObjectID{athleteId}, request)
 	if err != nil {
+		fmt.Printf("sendNotificationForMeetingAndAthlete failed: %d\n", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
