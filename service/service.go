@@ -36,6 +36,7 @@ func Init(c *mongo.Client) {
 	widgetService(database)
 	dashboardService(database)
 	notificationUserService(database)
+	configService(database)
 }
 
 func GetMeetingById(id string) (*meetingModel.Meeting, error) {
