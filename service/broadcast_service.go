@@ -19,6 +19,7 @@ func SendPushMeetingBroadcast(meetingId string, content string) (string, string,
 	}
 
 	if meeting.Data.PushNotificationChannel == "" {
+		fmt.Printf("push notification channel not set for meeting: '%s'\n", meetingId)
 		return "", "", "", 0, errors.New("meeting notification channel not set")
 	}
 
