@@ -183,8 +183,8 @@ func sendMeetingBroadcast(c *gin.Context) {
 		return
 	}
 
-	print("meeting: " + meeting)
-	print("content: " + string(content))
+	println("meeting: " + meeting)
+	println("content: " + string(content))
 
 	apnsRequestId, apnsUniqueId, body, status, err := service.SendPushMeetingBroadcast(meeting, string(content))
 	if err != nil {
