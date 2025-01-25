@@ -43,7 +43,7 @@ func Init(c *mongo.Client) {
 func GetMeetingById(id string) (*meetingModel.Meeting, error) {
 	existing := meetings[id]
 	if existing != nil {
-		fmt.Printf("returning cached meeting: %s\n", id)
+		fmt.Printf("returning cached meeting: %s\nvalues:\nid: %s;\nstart_date: %s;\nftp_mask: %s;\npush_channel: %s;\n", id, existing.MeetId, existing.DateStart, existing.Data.FtpStartListMask, existing.Data.PushNotificationChannel)
 		return existing, nil
 	}
 	meeting, err := mc.GetMeetingById(id)
