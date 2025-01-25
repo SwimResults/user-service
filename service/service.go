@@ -81,6 +81,11 @@ func InitMeetings() {
 		fmt.Printf("meeting: %s, channel: %s\n", meeting.MeetId, meeting.Data.PushNotificationChannel)
 		meetings[meeting.MeetId] = &meeting
 	}
+
+	println("added:")
+	for key, meeting := range meetings {
+		fmt.Printf("%s: %s\n", key, meeting.MeetId)
+	}
 }
 
 func InitConfigs() {
