@@ -23,6 +23,7 @@ func SendPushMeetingBroadcast(meetingId string, content string) (string, string,
 		return "", "", "", 0, errors.New("meeting notification channel not set")
 	}
 
+	fmt.Printf("received channel for meeting '%s': %s\ntrying to send...\n", meetingId, meeting.Data.PushNotificationChannel)
 	return SendPushBroadcast(meeting.Data.PushNotificationChannel, content)
 }
 
