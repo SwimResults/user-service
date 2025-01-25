@@ -22,8 +22,8 @@ var ac = athleteClient.NewAthleteClient(athleteServiceUrl)
 
 var client *mongo.Client
 
-var meetings = make(map[string]*meetingModel.Meeting)
-var configs = make(map[string]*model.Config)
+var meetings = make(map[string]meetingModel.Meeting)
+var configs = make(map[string]model.Config)
 
 func Init(c *mongo.Client) {
 	database := c.Database(os.Getenv("SR_USER_MONGO_DATABASE"))
@@ -42,32 +42,32 @@ func Init(c *mongo.Client) {
 
 func GetMeetingById(id string) (*meetingModel.Meeting, error) {
 	existing := meetings[id]
-	if existing != nil {
+	if existing.MeetId == id {
 		fmt.Printf("returning cached meeting: %s\nvalues:\nid: %s;\nstart_date: %s;\nftp_mask: %s;\npush_channel: %s;\n", id, existing.MeetId, existing.DateStart, existing.Data.FtpStartListMask, existing.Data.PushNotificationChannel)
-		return existing, nil
+		return &existing, nil
 	}
 	meeting, err := mc.GetMeetingById(id)
 	if err != nil {
 		return nil, err
 	}
 
-	meetings[id] = meeting
+	meetings[id] = *meeting
 
 	return meeting, nil
 }
 
 func GetStoredConfigByMeeting(meeting string) (*model.Config, error) {
 	existing := configs[meeting]
-	if existing != nil {
+	if existing.Meeting == meeting {
 		fmt.Printf("returning cached config: %s\n", meeting)
-		return existing, nil
+		return &existing, nil
 	}
 
 	return nil, errors.New("no config found")
 }
 
 func UpdateStoredConfigByMeeting(meeting string, config model.Config) {
-	configs[meeting] = &config
+	configs[meeting] = config
 }
 
 func InitMeetings() {
@@ -79,7 +79,7 @@ func InitMeetings() {
 
 	for _, meeting := range meetingList {
 		fmt.Printf("meeting: %s, channel: %s\n", meeting.MeetId, meeting.Data.PushNotificationChannel)
-		meetings[meeting.MeetId] = &meeting
+		meetings[meeting.MeetId] = meeting
 	}
 
 	println("added:")
@@ -96,7 +96,7 @@ func InitConfigs() {
 	}
 
 	for _, config := range configList {
-		configs[config.Meeting] = &config
+		configs[config.Meeting] = config
 	}
 }
 
