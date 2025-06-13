@@ -64,6 +64,7 @@ func submitReport(c *gin.Context) {
 	report.Message = submission.Message
 	report.SubjectId = submission.SubjectId
 	report.SubjectType = submission.SubjectType
+	report.Meeting = submission.Meeting
 
 	newReport, err := service.AddReport(report)
 	if err != nil {

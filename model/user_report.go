@@ -19,6 +19,7 @@ const (
 type UserReport struct {
 	Identifier  primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Message     string             `json:"message" bson:"message"`
+	Meeting     string             `json:"meeting,omitempty" bson:"meeting,omitempty"`
 	UserId      primitive.ObjectID `json:"user_id,omitempty" bson:"user_id,omitempty"`
 	SubjectId   primitive.ObjectID `json:"subject_id,omitempty" bson:"subject_id,omitempty"`
 	SubjectType ReportSubjectType  `json:"subject_type,omitempty" bson:"subject_type,omitempty"`
