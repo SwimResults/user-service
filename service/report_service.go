@@ -74,6 +74,8 @@ func AddReport(report model.UserReport) (model.UserReport, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	report.AddedAt = time.Now()
+
 	r, err := reportCollection.InsertOne(ctx, report)
 	if err != nil {
 		return model.UserReport{}, err

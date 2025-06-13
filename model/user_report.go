@@ -1,6 +1,9 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+)
 
 type ReportSubjectType string
 
@@ -19,6 +22,7 @@ type UserReport struct {
 	UserId      primitive.ObjectID `json:"user_id,omitempty" bson:"user_id,omitempty"`
 	SubjectId   primitive.ObjectID `json:"subject_id,omitempty" bson:"subject_id,omitempty"`
 	SubjectType ReportSubjectType  `json:"subject_type,omitempty" bson:"subject_type,omitempty"`
+	AddedAt     time.Time          `json:"added_at,omitempty" bson:"added_at,omitempty"`
 }
 
 func GetReportSubjectTypes() []ReportSubjectType {
