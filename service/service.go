@@ -36,6 +36,7 @@ func Init(c *mongo.Client) {
 	dashboardService(database)
 	notificationUserService(database)
 	configService(database)
+	reportService(database)
 
 	InitConfigs()
 }
