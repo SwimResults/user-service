@@ -13,6 +13,7 @@ func reportController() {
 	router.GET("/report", getReports)
 
 	router.GET("/report/subject-types", getSubjectTypes)
+	router.GET("/report/meet/:meeting", getReportsByMeeting)
 
 	router.POST("/report", addReport)
 	router.POST("/report/submit", submitReport)
@@ -22,6 +23,22 @@ func reportController() {
 
 func getReports(c *gin.Context) {
 	reports, err := service.GetReports()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, reports)
+}
+
+func getReportsByMeeting(c *gin.Context) {
+	meeting := c.Param("meeting")
+	if meeting == "" {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "no meeting given"})
+		return
+	}
+
+	reports, err := service.GetReportsByMeeting(meeting)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

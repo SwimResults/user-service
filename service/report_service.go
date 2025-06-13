@@ -58,6 +58,10 @@ func GetReports() ([]model.UserReport, error) {
 	return getReportsByBsonDocument(bson.D{})
 }
 
+func GetReportsByMeeting(meeting string) ([]model.UserReport, error) {
+	return getReportsByBsonDocument(bson.D{{"meeting", meeting}})
+}
+
 func RemoveReport(id primitive.ObjectID) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
