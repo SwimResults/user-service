@@ -96,7 +96,7 @@ func UpdateReport(report model.UserReport) (model.UserReport, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err := reportCollection.UpdateOne(ctx, bson.D{{"_id", report.Identifier}}, report)
+	_, err := reportCollection.ReplaceOne(ctx, bson.D{{"_id", report.Identifier}}, report)
 	if err != nil {
 		return model.UserReport{}, err
 	}
