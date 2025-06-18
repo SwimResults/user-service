@@ -91,3 +91,41 @@ func AddReport(report model.UserReport) (model.UserReport, error) {
 	}
 	return newReport, nil
 }
+
+func UpdateReport(report model.UserReport) (model.UserReport, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := reportCollection.UpdateOne(ctx, bson.D{{"_id", report.Identifier}}, report)
+	if err != nil {
+		return model.UserReport{}, err
+	}
+
+	newReport, err1 := getReportById(report.Identifier)
+	if err1 != nil {
+		return model.UserReport{}, err1
+	}
+	return newReport, nil
+}
+
+func ToggleReportAcknowledged(id primitive.ObjectID) (model.UserReport, error) {
+	report, err := getReportById(id)
+	if err != nil {
+		return model.UserReport{}, err
+	}
+
+	report.Acknowledged = !report.Acknowledged
+
+	return UpdateReport(report)
+}
+
+func ToggleReportComplete(id primitive.ObjectID) (model.UserReport, error) {
+	report, err := getReportById(id)
+	if err != nil {
+		return model.UserReport{}, err
+	}
+
+	report.Completed = !report.Completed
+
+	return UpdateReport(report)
+}

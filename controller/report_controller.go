@@ -18,6 +18,9 @@ func reportController() {
 	router.POST("/report", addReport)
 	router.POST("/report/submit", submitReport)
 
+	router.POST("/report/:id/acknowledge", acknowledgeReport)
+	router.POST("/report/:id/complete", completeReport)
+
 	router.DELETE("/report/:id", removeReport)
 }
 
@@ -104,6 +107,46 @@ func addReport(c *gin.Context) {
 	}
 
 	report, err := service.AddReport(report)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusCreated, report)
+}
+
+func acknowledgeReport(c *gin.Context) {
+	if failIfNotRoot(c) {
+		return
+	}
+
+	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
+	if convErr != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
+		return
+	}
+
+	report, err := service.ToggleReportAcknowledged(id)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusCreated, report)
+}
+
+func completeReport(c *gin.Context) {
+	if failIfNotRoot(c) {
+		return
+	}
+
+	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
+	if convErr != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
+		return
+	}
+
+	report, err := service.ToggleReportComplete(id)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
