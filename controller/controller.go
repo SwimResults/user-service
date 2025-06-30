@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
+	ginprometheus "github.com/zsais/go-gin-prometheus"
 	"net/http"
 	"os"
 	"strings"
@@ -31,6 +32,11 @@ func Run() {
 		fmt.Println("no security for inter-service communication given! Please set SR_SERVICE_KEY.")
 		return
 	}
+
+	p := ginprometheus.NewWithConfig(ginprometheus.Config{
+		Subsystem: "gin",
+	})
+	p.Use(router)
 
 	userController()
 	widgetController()
