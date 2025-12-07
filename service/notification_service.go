@@ -4,18 +4,16 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"sync"
+
 	"github.com/swimresults/user-service/apns"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/net/http2"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"sync"
 )
-
-var apnsUrl = os.Getenv("SR_APNS_URL")
 
 func SendTestPushNotification(receiver string) error {
 	token := apns.GetToken()
@@ -120,13 +118,13 @@ func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []pr
 		}
 
 		wg.Add(1)
-		go func(receiver string, title string, subtitle string, message string, interruptionLevel string, success *int) {
+		go func(receiver model.NotificationUser, title string, subtitle string, message string, interruptionLevel string, success *int) {
 			defer wg.Done()
-			_, _, code, err := SendPushNotification(receiver, title, subtitle, message, interruptionLevel)
+			_, _, code, err := SendPushNotification(receiver.PushService, receiver.Token, title, subtitle, message, interruptionLevel)
 			if err == nil || code == 200 {
 				*success++
 			}
-		}(user.Token, meeting.Series.NameMedium, request.Subtitle, request.Message, request.InterruptionLevel, &success)
+		}(user, meeting.Series.NameMedium, request.Subtitle, request.Message, request.InterruptionLevel, &success)
 	}
 
 	wg.Wait() // Wait for all goroutines to finish
@@ -149,62 +147,11 @@ func SendPushNotificationForMeeting(meetingId string, request dto.MeetingNotific
 	return SendPushNotificationForMeetingAndAthletes(meetingId, athleteIds, request)
 }
 
-func SendPushNotification(receiver string, title string, subtitle string, message string, interruptionLevel string) (string, string, int, error) {
-	token := apns.GetToken()
-
-	t := &http2.Transport{}
-	c := &http.Client{
-		Transport: t,
+func SendPushNotification(service string, receiver string, title string, subtitle string, message string, interruptionLevel string) (string, string, int, error) {
+	switch service {
+	case "FCM":
+		return SendFcmPushNotification(receiver, title, subtitle, message, interruptionLevel)
+	default:
+		return SendApnsPushNotification(receiver, title, subtitle, message, interruptionLevel)
 	}
-
-	if interruptionLevel == "" {
-		interruptionLevel = "active"
-	}
-
-	b := []byte(`
-		{
-			"aps": {
-				"alert": {
-					"title": "` + title + `",
-					"subtitle": "` + subtitle + `",
-					"body": "` + message + `"
-				},
-				"interruption-level": "` + interruptionLevel + `",
-				"sound": "default"
-			}
-		}
-	`)
-
-	fmt.Printf("notifying user with token: '%s'\n", receiver)
-
-	r, err := http.NewRequest("POST", apnsUrl+"/3/device/"+receiver, bytes.NewBuffer(b))
-	if err != nil {
-		fmt.Println(err)
-	}
-	r.Header.Set("Content-Type", "application/json")
-	r.Header.Set("Authorization", "Bearer "+token)
-
-	r.Header.Set("apns-push-type", "alert")
-	r.Header.Set("apns-expiration", "0")
-	r.Header.Set("apns-priority", "10")
-	r.Header.Set("apns-topic", "de.logilutions.SwimResults")
-
-	println("making request with token '" + token + "'")
-
-	resp, err := c.Do(r)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(string(body))
-
-	apnsID := resp.Header.Get("apns-unique-id")
-	println("apns-unique-id: " + apnsID)
-
-	return apnsID, string(body), resp.StatusCode, nil
 }

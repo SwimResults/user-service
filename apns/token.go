@@ -5,10 +5,11 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
-	"github.com/dgrijalva/jwt-go"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 const (

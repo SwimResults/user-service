@@ -4,14 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"time"
+
 	athleteClient "github.com/swimresults/athlete-service/client"
 	meetingClient "github.com/swimresults/meeting-service/client"
 	meetingModel "github.com/swimresults/meeting-service/model"
 	"github.com/swimresults/user-service/model"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"os"
-	"time"
 )
 
 var meetingServiceUrl = os.Getenv("SR_USER_MEETING_URL")
@@ -31,6 +32,7 @@ func Init(c *mongo.Client) {
 
 	InitMeetings()
 
+	fcmService()
 	userService(database)
 	widgetService(database)
 	dashboardService(database)
