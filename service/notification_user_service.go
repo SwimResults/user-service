@@ -145,6 +145,7 @@ func RegisterNotificationUser(token string, device model.Device, settings model.
 		existing.Device = device
 		existing.UpdatedAt = time.Now()
 		existing.Settings = settings
+		existing.PushService = pushService
 		if user != nil {
 			existing.UserId = user.Identifier
 		}
