@@ -9,6 +9,9 @@
 *.p8
 !AuthKey.p8
 
+/config/fcm/*.json
+!/config/fcm/private_key.json
+
 # Test binary, built with `go test -c`
 *.test
 

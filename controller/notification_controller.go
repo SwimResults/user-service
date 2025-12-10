@@ -2,12 +2,13 @@ package controller
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"io"
-	"net/http"
 )
 
 func notificationController() {
@@ -55,7 +56,9 @@ func sendNotification(c *gin.Context) {
 		return
 	}
 
-	apnsId, body, status, err := service.SendPushNotification(device, request.Title, request.Subtitle, request.Message, request.InterruptionLevel)
+	user, _ := service.GetNotificationUserByToken(device)
+
+	apnsId, body, status, err := service.SendPushNotification(user.PushService, user.Token, request.Title, request.Subtitle, request.Message, request.InterruptionLevel)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
