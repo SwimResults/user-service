@@ -112,7 +112,7 @@ func UpdateNotificationUser(user model.NotificationUser) (model.NotificationUser
 
 // RegisterNotificationUser adds the given token to the database,
 // if the token already exists, it just returns the user
-func RegisterNotificationUser(token string, device model.Device, settings model.NotificationSettings, user *model.User) (model.NotificationUser, error) {
+func RegisterNotificationUser(token string, device model.Device, settings model.NotificationSettings, pushService string, user *model.User) (model.NotificationUser, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -120,11 +120,12 @@ func RegisterNotificationUser(token string, device model.Device, settings model.
 	if err != nil {
 		if err.Error() == entryNotFoundMessage {
 			notificationUser := model.NotificationUser{
-				Token:     token,
-				Device:    device,
-				Settings:  settings,
-				AddedAt:   time.Now(),
-				UpdatedAt: time.Now(),
+				Token:       token,
+				Device:      device,
+				Settings:    settings,
+				PushService: pushService,
+				AddedAt:     time.Now(),
+				UpdatedAt:   time.Now(),
 			}
 
 			if user != nil {
