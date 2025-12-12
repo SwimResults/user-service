@@ -120,7 +120,7 @@ func SendPushNotificationForMeetingAndAthletes(meetingId string, athleteIds []pr
 		wg.Add(1)
 		go func(receiver model.NotificationUser, title string, subtitle string, message string, interruptionLevel string, success *int) {
 			defer wg.Done()
-			_, _, code, err := SendPushNotification(receiver.PushService, receiver.Token, title, subtitle, message, interruptionLevel)
+			_, _, code, err := SendPushNotification(receiver.PushService, receiver.Device.SystemName, receiver.Token, title, subtitle, message, interruptionLevel)
 			if err == nil || code == 200 {
 				*success++
 			}
@@ -147,11 +147,18 @@ func SendPushNotificationForMeeting(meetingId string, request dto.MeetingNotific
 	return SendPushNotificationForMeetingAndAthletes(meetingId, athleteIds, request)
 }
 
-func SendPushNotification(service string, receiver string, title string, subtitle string, message string, interruptionLevel string) (string, string, int, error) {
+func SendPushNotification(service string, systemName string, receiver string, title string, subtitle string, message string, interruptionLevel string) (string, string, int, error) {
 	switch service {
 	case "FCM":
 		return SendFcmPushNotification(receiver, title, subtitle, message, interruptionLevel)
 	default:
-		return SendApnsPushNotification(receiver, title, subtitle, message, interruptionLevel)
+		switch systemName {
+		case "iOS":
+			return SendApnsPushNotification(receiver, title, subtitle, message, interruptionLevel)
+		case "Android":
+			return SendFcmPushNotification(receiver, title, subtitle, message, interruptionLevel)
+		default:
+			return "", "", 0, errors.New("unknown token origin: " + service)
+		}
 	}
 }
