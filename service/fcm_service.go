@@ -34,7 +34,7 @@ func SendFcmPushNotification(receiver string, title string, subtitle string, bod
 	message := &messaging.Message{
 		Notification: &messaging.Notification{
 			Title: title,
-			Body:  body,
+			Body:  subtitle + ": " + body,
 		},
 		Data: map[string]string{
 			"interruptionLevel": interruptionLevel,
