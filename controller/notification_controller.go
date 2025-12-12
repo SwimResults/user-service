@@ -58,7 +58,7 @@ func sendNotification(c *gin.Context) {
 
 	user, _ := service.GetNotificationUserByToken(device)
 
-	apnsId, body, status, err := service.SendPushNotification(user.PushService, user.Token, request.Title, request.Subtitle, request.Message, request.InterruptionLevel)
+	apnsId, body, status, err := service.SendPushNotification(user.PushService, user.Device.SystemName, user.Token, request.Title, request.Subtitle, request.Message, request.InterruptionLevel)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
