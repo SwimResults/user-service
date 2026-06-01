@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,13 +14,13 @@ import (
 
 func notificationController() {
 
-	router.POST("/notification/test/:device", sendTestNotification)
-	router.POST("/notification/:device", sendNotification)
-	router.POST("/notification/meet/:meeting", sendNotificationForMeeting)
-	router.POST("/notification/meet/:meeting/athlete/:athlete", sendNotificationForMeetingAndAthlete)
+	security.Route(router, "POST", "/notification/test/:device", security.PermissionAdmin, sendTestNotification)
+	security.Route(router, "POST", "/notification/:device", security.PermissionAdmin, sendNotification)
+	security.Route(router, "POST", "/notification/meet/:meeting", security.PermissionAdmin, sendNotificationForMeeting)
+	security.Route(router, "POST", "/notification/meet/:meeting/athlete/:athlete", security.PermissionAdmin, sendNotificationForMeetingAndAthlete)
 
-	router.POST("/notification/broadcast/:channel", sendBroadcast)
-	router.POST("/notification/broadcast/meeting/:meeting", sendMeetingBroadcast)
+	security.Route(router, "POST", "/notification/broadcast/:channel", security.PermissionAdmin, sendBroadcast)
+	security.Route(router, "POST", "/notification/broadcast/meeting/:meeting", security.PermissionAdmin, sendMeetingBroadcast)
 
 	router.OPTIONS("/notification/test/:device", okay)
 	router.OPTIONS("/notification/:device", okay)

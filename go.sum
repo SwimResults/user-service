@@ -159,6 +159,10 @@ github.com/swimresults/meeting-service v0.8.0 h1:1JH7dx60Fz5fkynGAfzlqn4Q/CsQIz7
 github.com/swimresults/meeting-service v0.8.0/go.mod h1:CMlCDEdbyLxA3MblOIvfxzD64hUKkYdSwfsupc+GLW4=
 github.com/swimresults/service-core v0.7.0 h1:s4ULap/XH+/Ztp3rsCyk7xGQy7+pLPkBl6dODmRqano=
 github.com/swimresults/service-core v0.7.0/go.mod h1:PDH00AdKjzQ8nPSPtPIblDBENxm1Q7885duzEEW1aC8=
+github.com/swimresults/service-core v0.8.2 h1:mG5DrpEKISl3HVA+VjDSPnmrRq3Hgk67VuLqGjFXlkA=
+github.com/swimresults/service-core v0.8.2/go.mod h1:z8ywRluddSZBynCS2mW9Sgp3XCk84UDF9uziGRxmkTs=
+github.com/swimresults/service-core v0.9.3 h1:tz50DgmDABjMwKDWXH5TEEtj/f7RImxNqVKPhkhSK2g=
+github.com/swimresults/service-core v0.9.3/go.mod h1:z8ywRluddSZBynCS2mW9Sgp3XCk84UDF9uziGRxmkTs=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
 github.com/ugorji/go/codec v1.3.0 h1:Qd2W2sQawAfG8XSvzwhBeoGq71zXOC/Q1E9y/wUcsUA=

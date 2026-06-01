@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
 	"net/http"
@@ -10,8 +11,8 @@ import (
 func configController() {
 	router.GET("/config", getConfigs)
 
-	router.POST("/config/enable/:meeting/:enable", setEnable)
-	router.POST("/config", addConfig)
+	security.Route(router, "POST", "/config/enable/:meeting/:enable", security.PermissionAdmin, setEnable)
+	security.Route(router, "POST", "/config", security.PermissionAdmin, addConfig)
 }
 
 func getConfigs(c *gin.Context) {

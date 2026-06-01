@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
@@ -10,20 +11,20 @@ import (
 )
 
 func notificationUserController() {
-	router.GET("/notification_user/public/token/:token", getNotificationUserByToken)
-	router.POST("/notification_user/public/register", registerNotificationUserWithoutToken)
+	security.Route(router, "GET", "/notification_user/public/token/:token", security.PermissionPublic, getNotificationUserByToken)
+	security.Route(router, "POST", "/notification_user/public/register", security.PermissionPublic, registerNotificationUserWithoutToken)
 
-	router.GET("/notification_users", getNotificationUsers)
-	router.GET("/notification_user", getNotificationUser)
-	router.GET("/notification_user/:id", getNotificationUserById)
+	security.Route(router, "GET", "/notification_users", security.PermissionAdmin, getNotificationUsers)
+	security.Route(router, "GET", "/notification_user", security.PermissionPublic, getNotificationUser)
+	security.Route(router, "GET", "/notification_user/:id", security.PermissionAdmin, getNotificationUserById)
 
-	router.POST("/notification_user", addNotificationUser)
-	router.POST("/notification_user/register", registerNotificationUserWithoutToken)
-	router.POST("/notification_user/register/user", registerNotificationUser)
+	security.Route(router, "POST", "/notification_user", security.PermissionAdmin, addNotificationUser)
+	security.Route(router, "POST", "/notification_user/register", security.PermissionPublic, registerNotificationUserWithoutToken)
+	security.Route(router, "POST", "/notification_user/register/user", security.PermissionPublic, registerNotificationUser)
 
-	router.DELETE("/notification_user/:id", removeNotificationUser)
+	security.Route(router, "DELETE", "/notification_user/:id", security.PermissionAdmin, removeNotificationUser)
 
-	router.PUT("/notification_user", updateNotificationUser)
+	security.Route(router, "PUT", "/notification_user", security.PermissionAdmin, updateNotificationUser)
 
 	router.OPTIONS("/notification_user", okay)
 	router.OPTIONS("/notification_user/register", okay)

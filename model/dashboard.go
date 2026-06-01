@@ -9,4 +9,5 @@ type Dashboard struct {
 	Official        bool               `json:"official,omitempty" bson:"official,omitempty"`
 	Default         bool               `json:"default,omitempty" bson:"default,omitempty"`
 	MeetingStates   []string           `json:"meeting_states,omitempty" bson:"meeting_states,omitempty"`
+	Meeting         string             `json:"meeting,omitempty" bson:"meeting,omitempty"`
 }

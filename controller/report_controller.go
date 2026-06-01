@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
@@ -15,13 +16,13 @@ func reportController() {
 	router.GET("/report/subject-types", getSubjectTypes)
 	router.GET("/report/meet/:meeting", getReportsByMeeting)
 
-	router.POST("/report", addReport)
-	router.POST("/report/submit", submitReport)
+	security.Route(router, "POST", "/report", security.PermissionAdmin, addReport)
+	security.Route(router, "POST", "/report/submit", security.PermissionPublic, submitReport)
 
-	router.POST("/report/:id/acknowledge", acknowledgeReport)
-	router.POST("/report/:id/complete", completeReport)
+	security.Route(router, "POST", "/report/:id/acknowledge", security.PermissionAdmin, acknowledgeReport)
+	security.Route(router, "POST", "/report/:id/complete", security.PermissionAdmin, completeReport)
 
-	router.DELETE("/report/:id", removeReport)
+	security.Route(router, "DELETE", "/report/:id", security.PermissionAdmin, removeReport)
 }
 
 func getReports(c *gin.Context) {

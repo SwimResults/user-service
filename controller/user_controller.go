@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
@@ -14,16 +15,16 @@ func userController() {
 	router.GET("/user", getUser)
 	router.GET("/user/:id", getUserById)
 
-	router.POST("/user", addUser)
-	router.POST("/user/athlete", changeFollowerForUser)
-	router.POST("/user/meeting", updateMeetings)
-	router.POST("/user/me", changeMe)
-	router.POST("/user/language", updateUserLanguage)
-	router.POST("/user/theme", updateUserTheme)
+	security.Route(router, "POST", "/user", security.PermissionAdmin, addUser)
+	security.Route(router, "POST", "/user/athlete", security.PermissionPublic, changeFollowerForUser)
+	security.Route(router, "POST", "/user/meeting", security.PermissionPublic, updateMeetings)
+	security.Route(router, "POST", "/user/me", security.PermissionPublic, changeMe)
+	security.Route(router, "POST", "/user/language", security.PermissionPublic, updateUserLanguage)
+	security.Route(router, "POST", "/user/theme", security.PermissionPublic, updateUserTheme)
 
-	router.DELETE("/user/:id", removeUser)
+	security.Route(router, "DELETE", "/user/:id", security.PermissionAdmin, removeUser)
 
-	router.PUT("/user", updateUser)
+	security.Route(router, "PUT", "/user", security.PermissionAdmin, updateUser)
 
 	router.OPTIONS("/user", okay)
 	router.OPTIONS("/user/athlete", okay)

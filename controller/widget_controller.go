@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -11,9 +12,9 @@ import (
 func widgetController() {
 	router.GET("/widget", getWidgets)
 
-	router.POST("/widget", addWidget)
+	security.Route(router, "POST", "/widget", security.PermissionAdmin, addWidget)
 
-	router.DELETE("/widget/:id", removeWidget)
+	security.Route(router, "DELETE", "/widget/:id", security.PermissionAdmin, removeWidget)
 }
 
 func getWidgets(c *gin.Context) {
