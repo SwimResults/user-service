@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -16,7 +15,6 @@ import (
 )
 
 var router = gin.Default()
-var serviceKey string
 
 func Run() {
 
@@ -66,34 +64,6 @@ func actuator(c *gin.Context) {
 	c.String(http.StatusOK, state)
 }
 
-func checkServiceKey(c *gin.Context) error {
-	println("checking service key...")
-	received := c.Request.Header["X-Swimresults-Service"]
-	fmt.Printf("received: '%s', expected: '%s'\n", received, serviceKey)
-	if len(received) <= 0 {
-		return errors.New("no service authorization key in header")
-	}
-	if received[0] == serviceKey {
-		return nil
-	}
-
-	return errors.New("invalid service authorization key in header")
-}
-
-func checkAuthHeaderToken(c *gin.Context) error {
-	claims, err1 := getClaimsFromAuthHeader(c)
-
-	if err1 != nil {
-		return err1
-	}
-
-	if !claims.IsRoot() {
-		return errors.New("insufficient permissions")
-	}
-
-	return nil
-}
-
 func getClaimsFromAuthHeader(c *gin.Context) (*model.TokenClaims, error) {
 	claims, err1 := security.ValidateAuthorizationHeader(c.GetHeader("Authorization"))
 	if err1 != nil {
@@ -114,32 +84,4 @@ func getClaimsFromAuthHeader(c *gin.Context) (*model.TokenClaims, error) {
 	tokenClaims.Scopes = strings.Fields(claims.Scope)
 
 	return &tokenClaims, nil
-}
-
-func checkIfRoot(c *gin.Context) error {
-	keyError := checkServiceKey(c)
-	if keyError == nil {
-		return nil
-	}
-
-	tokenError := checkAuthHeaderToken(c)
-
-	if tokenError == nil {
-		return nil
-	} else {
-		fmt.Printf("both auth checks for root failed: \n%s\n%s\n", keyError, tokenError)
-		return tokenError
-	}
-}
-
-// failIfNotRoot returns true if the requester is not root or a service
-func failIfNotRoot(c *gin.Context) bool {
-	err := checkIfRoot(c)
-
-	if err == nil {
-		return false
-	} else {
-		c.IndentedJSON(http.StatusUnauthorized, err.Error())
-		return true
-	}
 }
