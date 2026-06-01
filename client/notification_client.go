@@ -3,10 +3,11 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/swimresults/service-core/client"
 	"github.com/swimresults/user-service/dto"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
 )
 
 type NotificationClient struct {
@@ -17,17 +18,14 @@ func NewNotificationClient(url string) *NotificationClient {
 	return &NotificationClient{apiUrl: url}
 }
 
-func (c *NotificationClient) SendNotification(key string, meeting string, title string, subtitle string, message string) (*dto.NotificationResponseDto, error) {
+func (c *NotificationClient) SendNotification(title string, subtitle string, message string) (*dto.NotificationResponseDto, error) {
 	request := dto.NotificationRequestDto{
 		Title:    title,
 		Subtitle: subtitle,
 		Message:  message,
 	}
 
-	header := http.Header{}
-	header.Set("X-SWIMRESULTS-SERVICE", key)
-
-	res, err := client.Post(c.apiUrl, "notification/import", request, &header)
+	res, err := client.Post(c.apiUrl, "notification/import", request, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +43,7 @@ func (c *NotificationClient) SendNotification(key string, meeting string, title 
 	return responseDto, nil
 }
 
-func (c *NotificationClient) SendNotificationForMeetingAndAthlete(key string, meeting string, athleteId primitive.ObjectID, subtitle string, message string, messageType string, interruptionLevel string) (*dto.NotificationResponseDto, error) {
+func (c *NotificationClient) SendNotificationForMeetingAndAthlete(meeting string, athleteId primitive.ObjectID, subtitle string, message string, messageType string, interruptionLevel string) (*dto.NotificationResponseDto, error) {
 	request := dto.MeetingNotificationRequestDto{
 		Subtitle:          subtitle,
 		Message:           message,
@@ -53,10 +51,7 @@ func (c *NotificationClient) SendNotificationForMeetingAndAthlete(key string, me
 		InterruptionLevel: interruptionLevel,
 	}
 
-	header := http.Header{}
-	header.Set("X-SWIMRESULTS-SERVICE", key)
-
-	res, err := client.Post(c.apiUrl, "notification/meet/"+meeting+"/athlete/"+athleteId.Hex(), request, &header)
+	res, err := client.Post(c.apiUrl, "notification/meet/"+meeting+"/athlete/"+athleteId.Hex(), request, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -74,13 +69,10 @@ func (c *NotificationClient) SendNotificationForMeetingAndAthlete(key string, me
 	return responseDto, nil
 }
 
-func (c *NotificationClient) SendMeetingBroadcastNotification(key string, meeting string, body interface{}) (*dto.BroadcastResponseDto, error) {
+func (c *NotificationClient) SendMeetingBroadcastNotification(meeting string, body interface{}) (*dto.BroadcastResponseDto, error) {
 	fmt.Printf("sending meeting broadcast request to: '%s'\n", "notification/broadcast/meeting/"+meeting)
 
-	header := http.Header{}
-	header.Set("X-SWIMRESULTS-SERVICE", key)
-
-	res, err := client.Post(c.apiUrl, "notification/broadcast/meeting/"+meeting, body, &header)
+	res, err := client.Post(c.apiUrl, "notification/broadcast/meeting/"+meeting, body, nil)
 	if err != nil {
 		return nil, err
 	}
