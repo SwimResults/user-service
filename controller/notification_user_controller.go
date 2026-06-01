@@ -32,11 +32,6 @@ func notificationUserController() {
 }
 
 func getNotificationUsers(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	users, err := service.GetNotificationUsers()
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -89,11 +84,6 @@ func getNotificationUserByToken(c *gin.Context) {
 }
 
 func getNotificationUserById(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
@@ -110,11 +100,6 @@ func getNotificationUserById(c *gin.Context) {
 }
 
 func removeNotificationUser(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
@@ -131,11 +116,6 @@ func removeNotificationUser(c *gin.Context) {
 }
 
 func addNotificationUser(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	var user model.NotificationUser
 	if err := c.BindJSON(&user); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -152,11 +132,6 @@ func addNotificationUser(c *gin.Context) {
 }
 
 func updateNotificationUser(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	var user model.NotificationUser
 	if err := c.BindJSON(&user); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})

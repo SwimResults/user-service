@@ -11,8 +11,8 @@ import (
 )
 
 func dashboardController() {
-	router.GET("/dashboard", getUserDashboard)
-	router.GET("/dashboard/default", getDefaultDashboard)
+	security.Route(router, "GET", "/dashboard", security.PermissionPublic, getUserDashboard)
+	security.Route(router, "GET", "/dashboard/default", security.PermissionPublic, getDefaultDashboard)
 
 	security.Route(router, "POST", "/dashboard", security.PermissionPublic, addUserDashboard)
 

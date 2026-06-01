@@ -10,7 +10,7 @@ import (
 )
 
 func widgetController() {
-	router.GET("/widget", getWidgets)
+	security.Route(router, "GET", "/widget", security.PermissionPublic, getWidgets)
 
 	security.Route(router, "POST", "/widget", security.PermissionAdmin, addWidget)
 
@@ -28,10 +28,6 @@ func getWidgets(c *gin.Context) {
 }
 
 func addWidget(c *gin.Context) {
-	if failIfNotRoot(c) {
-		return
-	}
-
 	var widget model.Widget
 	if err := c.BindJSON(&widget); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -48,10 +44,6 @@ func addWidget(c *gin.Context) {
 }
 
 func removeWidget(c *gin.Context) {
-	if failIfNotRoot(c) {
-		return
-	}
-
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})

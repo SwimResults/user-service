@@ -1,26 +1,22 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
-	"net/http"
 )
 
 func configController() {
-	router.GET("/config", getConfigs)
+	security.Route(router, "GET", "/config", security.PermissionAdmin, getConfigs)
 
 	security.Route(router, "POST", "/config/enable/:meeting/:enable", security.PermissionAdmin, setEnable)
 	security.Route(router, "POST", "/config", security.PermissionAdmin, addConfig)
 }
 
 func getConfigs(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	configs, err := service.GetConfigs()
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -31,11 +27,6 @@ func getConfigs(c *gin.Context) {
 }
 
 func setEnable(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	meeting := c.Param("meeting")
 	if meeting == "" {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "no meeting given"})
@@ -54,11 +45,6 @@ func setEnable(c *gin.Context) {
 }
 
 func addConfig(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	var config model.Config
 	if err := c.BindJSON(&config); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})

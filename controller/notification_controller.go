@@ -27,11 +27,6 @@ func notificationController() {
 }
 
 func sendTestNotification(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	device := c.Param("device")
 
 	err := service.SendTestPushNotification(device)
@@ -44,11 +39,6 @@ func sendTestNotification(c *gin.Context) {
 }
 
 func sendNotification(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	device := c.Param("device")
 
 	var request dto.NotificationRequestDto
@@ -72,11 +62,6 @@ func sendNotification(c *gin.Context) {
 }
 
 func sendNotificationForMeeting(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	meeting := c.Param("meeting")
 
 	if meeting == "" {
@@ -104,11 +89,6 @@ func sendNotificationForMeeting(c *gin.Context) {
 }
 
 func sendNotificationForMeetingAndAthlete(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	meeting := c.Param("meeting")
 
 	if meeting == "" {
@@ -144,11 +124,6 @@ func sendNotificationForMeetingAndAthlete(c *gin.Context) {
 }
 
 func sendBroadcast(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	channel := c.Param("channel")
 
 	content, err := io.ReadAll(c.Request.Body)
@@ -174,11 +149,6 @@ func sendBroadcast(c *gin.Context) {
 }
 
 func sendMeetingBroadcast(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	meeting := c.Param("meeting")
 
 	content, err := io.ReadAll(c.Request.Body)

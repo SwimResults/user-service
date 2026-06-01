@@ -1,20 +1,21 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
 )
 
 func reportController() {
-	router.GET("/report", getReports)
+	security.Route(router, "GET", "/report", security.PermissionAdmin, getReports)
 
-	router.GET("/report/subject-types", getSubjectTypes)
-	router.GET("/report/meet/:meeting", getReportsByMeeting)
+	security.Route(router, "GET", "/report/subject-types", security.PermissionPublic, getSubjectTypes)
+	security.Route(router, "GET", "/report/meet/:meeting", security.PermissionAdmin, getReportsByMeeting)
 
 	security.Route(router, "POST", "/report", security.PermissionAdmin, addReport)
 	security.Route(router, "POST", "/report/submit", security.PermissionPublic, submitReport)
@@ -97,10 +98,6 @@ func submitReport(c *gin.Context) {
 }
 
 func addReport(c *gin.Context) {
-	if failIfNotRoot(c) {
-		return
-	}
-
 	var report model.UserReport
 	if err := c.BindJSON(&report); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -117,10 +114,6 @@ func addReport(c *gin.Context) {
 }
 
 func acknowledgeReport(c *gin.Context) {
-	if failIfNotRoot(c) {
-		return
-	}
-
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
@@ -137,10 +130,6 @@ func acknowledgeReport(c *gin.Context) {
 }
 
 func completeReport(c *gin.Context) {
-	if failIfNotRoot(c) {
-		return
-	}
-
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
@@ -157,10 +146,6 @@ func completeReport(c *gin.Context) {
 }
 
 func removeReport(c *gin.Context) {
-	if failIfNotRoot(c) {
-		return
-	}
-
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})

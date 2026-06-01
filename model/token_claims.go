@@ -7,9 +7,9 @@ type TokenClaims struct {
 	Scopes []string
 }
 
-func (tc *TokenClaims) IsRoot() bool {
+func (tc *TokenClaims) IsAdmin() bool {
 	for _, scope := range tc.Scopes {
-		if scope == "root" {
+		if scope == "admin" {
 			return true
 		}
 	}
