@@ -84,11 +84,6 @@ func getUserById(c *gin.Context) {
 }
 
 func removeUser(c *gin.Context) {
-
-	if failIfNotAdmin(c) {
-		return
-	}
-
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
