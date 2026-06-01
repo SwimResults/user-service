@@ -1,20 +1,22 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
 )
 
 func dashboardController() {
-	router.GET("/dashboard", getUserDashboard)
-	router.GET("/dashboard/default", getDefaultDashboard)
+	security.Route(router, "GET", "/dashboard", security.PermissionPublic, getUserDashboard)
+	security.Route(router, "GET", "/dashboard/default", security.PermissionPublic, getDefaultDashboard)
 
-	router.POST("/dashboard", addUserDashboard)
+	security.Route(router, "POST", "/dashboard", security.PermissionPublic, addUserDashboard)
 
-	router.DELETE("/dashboard/:id", removeUserDashboard)
+	security.Route(router, "DELETE", "/dashboard/:id", security.PermissionPublic, removeUserDashboard)
 
 	router.OPTIONS("/dashboard", okay)
 }

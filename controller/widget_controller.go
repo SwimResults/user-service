@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -9,11 +10,11 @@ import (
 )
 
 func widgetController() {
-	router.GET("/widget", getWidgets)
+	security.Route(router, "GET", "/widget", security.PermissionPublic, getWidgets)
 
-	router.POST("/widget", addWidget)
+	security.Route(router, "POST", "/widget", security.PermissionAdmin, addWidget)
 
-	router.DELETE("/widget/:id", removeWidget)
+	security.Route(router, "DELETE", "/widget/:id", security.PermissionAdmin, removeWidget)
 }
 
 func getWidgets(c *gin.Context) {
@@ -27,10 +28,6 @@ func getWidgets(c *gin.Context) {
 }
 
 func addWidget(c *gin.Context) {
-	if failIfNotRoot(c) {
-		return
-	}
-
 	var widget model.Widget
 	if err := c.BindJSON(&widget); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -47,10 +44,6 @@ func addWidget(c *gin.Context) {
 }
 
 func removeWidget(c *gin.Context) {
-	if failIfNotRoot(c) {
-		return
-	}
-
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
