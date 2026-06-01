@@ -1,19 +1,20 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/swimresults/service-core/security"
 	"github.com/swimresults/user-service/dto"
 	"github.com/swimresults/user-service/model"
 	"github.com/swimresults/user-service/service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
 )
 
 func userController() {
-	router.GET("/users", getUsers)
-	router.GET("/user", getUser)
-	router.GET("/user/:id", getUserById)
+	security.Route(router, "GET", "/users", security.PermissionAdmin, getUsers)
+	security.Route(router, "GET", "/user", security.PermissionPublic, getUser)
+	security.Route(router, "GET", "/user/:id", security.PermissionAdmin, getUserById)
 
 	security.Route(router, "POST", "/user", security.PermissionAdmin, addUser)
 	security.Route(router, "POST", "/user/athlete", security.PermissionPublic, changeFollowerForUser)
@@ -39,11 +40,6 @@ func okay(c *gin.Context) {
 }
 
 func getUsers(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	users, err := service.GetUsers()
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -72,11 +68,6 @@ func getUser(c *gin.Context) {
 }
 
 func getUserById(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	id, convErr := primitive.ObjectIDFromHex(c.Param("id"))
 	if convErr != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "given id was not of type ObjectID"})
@@ -94,7 +85,7 @@ func getUserById(c *gin.Context) {
 
 func removeUser(c *gin.Context) {
 
-	if failIfNotRoot(c) {
+	if failIfNotAdmin(c) {
 		return
 	}
 
@@ -114,11 +105,6 @@ func removeUser(c *gin.Context) {
 }
 
 func addUser(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	var user model.User
 	if err := c.BindJSON(&user); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -250,11 +236,6 @@ func updateMeetings(c *gin.Context) {
 }
 
 func updateUser(c *gin.Context) {
-
-	if failIfNotRoot(c) {
-		return
-	}
-
 	var user model.User
 	if err := c.BindJSON(&user); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
