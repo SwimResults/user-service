@@ -7,9 +7,7 @@ import (
 	"os"
 	"time"
 
-	athleteClient "github.com/swimresults/athlete-service/client"
-	meetingClient "github.com/swimresults/meeting-service/client"
-	meetingModel "github.com/swimresults/meeting-service/model"
+	meetingModel "github.com/swimresults/swimresults-api/go/meetingapi"
 	"github.com/swimresults/user-service/model"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -18,8 +16,9 @@ import (
 var meetingServiceUrl = os.Getenv("SR_USER_MEETING_URL")
 var athleteServiceUrl = os.Getenv("SR_USER_ATHLETE_URL")
 
-var mc = meetingClient.NewMeetingClient(meetingServiceUrl)
-var ac = athleteClient.NewAthleteClient(athleteServiceUrl)
+// clients for the other services, see clients.go
+var mc = newMeetingClient(meetingServiceUrl)
+var ac = newAthleteClient(athleteServiceUrl)
 
 var client *mongo.Client
 
